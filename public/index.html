@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PERC - Plan Épargne Retraite Complémentaire</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <style>
+      :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #e74c3c;
+        --success-color: #27ae60;
+        --info-color: #3498db;
+        --warning-color: #f39c12;
+      }
+
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .hero-section {
+        padding: 60px 0;
+        color: white;
+        text-align: center;
+      }
+
+      .hero-section h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .hero-section p {
+        font-size: 1.3rem;
+        opacity: 0.95;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        padding: 40px;
+        max-width: 450px;
+        margin: 0 auto;
+      }
+
+      .dashboard-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+      }
+
+      .dashboard-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .stat-card {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--info-color)
+        );
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+      }
+
+      .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 10px 0;
+      }
+
+      .stat-label {
+        font-size: 0.95rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn-custom {
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary-custom {
+        background: var(--info-color);
+        border: none;
+        color: white;
+      }
+
+      .btn-primary-custom:hover {
+        background: #2980b9;
+        transform: scale(1.05);
+      }
+
+      .contribution-item {
+        border-left: 4px solid var(--success-color);
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+
+      .navbar-custom {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--info-color);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .badge-custom {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+      }
+
+      #loginSection,
+      #dashboardSection {
+        display: none;
+      }
+
+      .otp-input {
+        font-size: 2rem;
+        text-align: center;
+        letter-spacing: 10px;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Section Héro / Login -->
+    <div id="loginSection">
+      <div class="hero-section">
+        <div class="container">
+          <h1><i class="bi bi-piggy-bank"></i> PERC</h1>
+          <p>Plan Épargne Retraite Complémentaire des Douanes</p>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="login-card">
+          <h3 class="text-center mb-4">Connexion</h3>
+
+          <!-- Étape 1: Saisie matricule -->
+          <div id="step1">
+            <div class="mb-3">
+              <label class="form-label">Matricule</label>
+              <input
+                type="text"
+                class="form-control form-control-lg"
+                id="matriculeInput"
+                placeholder="Ex: 508924B"
+              />
+            </div>
+            <button
+              class="btn btn-primary-custom btn-custom w-100"
+              onclick="requestOTP()"
+            >
+              <i class="bi bi-arrow-right-circle"></i> Continuer
+            </button>
+          </div>
+
+          <!-- Étape 2: Saisie OTP -->
+          <div id="step2" style="display: none">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i> Un code a été envoyé à votre
+              numéro
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Code de vérification</label>
+              <input
+                type="text"
+                class="form-control form-control-lg otp-input"
+                id="otpInput"
+                maxlength="6"
+                placeholder="000000"
+              />
+            </div>
+            <button
+              class="btn btn-primary-custom btn-custom w-100"
+              onclick="verifyOTP()"
+            >
+              <i class="bi bi-check-circle"></i> Valider
+            </button>
+            <button class="btn btn-link w-100 mt-2" onclick="backToStep1()">
+              Retour
+            </button>
+          </div>
+
+          <div
+            id="loginError"
+            class="alert alert-danger mt-3"
+            style="display: none"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Dashboard -->
+    <div id="dashboardSection">
+      <!-- Navbar -->
+      <nav class="navbar navbar-custom sticky-top">
+        <div class="container">
+          <span class="navbar-brand">
+            <i class="bi bi-piggy-bank"></i> PERC
+          </span>
+          <div>
+            <span class="me-3" id="userNameNav"></span>
+            <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+              <i class="bi bi-box-arrow-right"></i> Déconnexion
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div class="container mt-4">
+        <!-- En-tête profil -->
+        <div class="dashboard-card">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h4>
+                <i class="bi bi-person-circle"></i> <span id="userName"></span>
+              </h4>
+              <p class="mb-1">
+                <strong>Matricule:</strong> <span id="userMatricule"></span>
+              </p>
+              <p class="mb-1">
+                <strong>Compte CGF:</strong> <span id="userCompte"></span>
+              </p>
+              <p class="mb-0">
+                <strong>Direction:</strong> <span id="userDirection"></span>
+              </p>
+            </div>
+            <div class="col-md-4 text-end">
+              <span class="badge badge-custom bg-success">Compte Actif</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="row">
+          <div class="col-md-4">
+            <div class="stat-card">
+              <div class="stat-label">Solde Actuel</div>
+              <div class="stat-value" id="soldeActuel">0 F CFA</div>
+              <small><i class="bi bi-graph-up"></i> Votre épargne totale</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div
+              class="stat-card"
+              style="
+                background: linear-gradient(
+                  135deg,
+                  var(--success-color),
+                  #2ecc71
+                );
+              "
+            >
+              <div class="stat-label">Contributions</div>
+              <div class="stat-value" id="nombreContributions">0</div>
+              <small
+                ><i class="bi bi-calendar-check"></i> Versements
+                effectués</small
+              >
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div
+              class="stat-card"
+              style="
+                background: linear-gradient(
+                  135deg,
+                  var(--warning-color),
+                  #f1c40f
+                );
+              "
+            >
+              <div class="stat-label">Total Versé</div>
+              <div class="stat-value" id="totalVerse">0 F CFA</div>
+              <small><i class="bi bi-cash-stack"></i> Montant cumulé</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dernières contributions -->
+        <div class="dashboard-card">
+          <h5 class="mb-4">
+            <i class="bi bi-list-ul"></i> Dernières Contributions
+          </h5>
+          <div id="contributionsList">
+            <div class="loading-spinner"></div>
+          </div>
+          <button
+            class="btn btn-outline-primary mt-3"
+            onclick="showAllContributions()"
+          >
+            Voir l'historique complet <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const API_URL = "http://localhost:3000/api";
+      let authToken = localStorage.getItem("percToken");
+
+      // Au chargement
+      window.onload = function () {
+        if (authToken) {
+          verifyTokenAndLoadDashboard();
+        } else {
+          showLoginSection();
+        }
+      };
+
+      function showLoginSection() {
+        document.getElementById("loginSection").style.display = "block";
+        document.getElementById("dashboardSection").style.display = "none";
+      }
+
+      function showDashboard() {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("dashboardSection").style.display = "block";
+        loadDashboardData();
+      }
+
+      async function requestOTP() {
+        const matricule = document
+          .getElementById("matriculeInput")
+          .value.trim();
+
+        if (!matricule) {
+          showError("Veuillez saisir votre matricule");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/auth/request-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ matricule }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+
+            // En dev, pré-remplir l'OTP
+            if (data.otp) {
+              document.getElementById("otpInput").value = data.otp;
+            }
+          } else {
+            showError(data.message);
+          }
+        } catch (error) {
+          showError("Erreur de connexion au serveur");
+        }
+      }
+
+      async function verifyOTP() {
+        const matricule = document
+          .getElementById("matriculeInput")
+          .value.trim();
+        const code = document.getElementById("otpInput").value.trim();
+
+        if (!code || code.length !== 6) {
+          showError("Code invalide");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/auth/verify-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ matricule, code }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            authToken = data.token;
+            localStorage.setItem("percToken", authToken);
+            localStorage.setItem("percUser", JSON.stringify(data.user));
+            showDashboard();
+          } else {
+            showError(data.message);
+          }
+        } catch (error) {
+          showError("Erreur de connexion au serveur");
+        }
+      }
+
+      async function verifyTokenAndLoadDashboard() {
+        try {
+          const response = await fetch(`${API_URL}/auth/verify-token`, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+
+          const data = await response.json();
+
+          if (data.success && data.valid) {
+            showDashboard();
+          } else {
+            logout();
+          }
+        } catch (error) {
+          logout();
+        }
+      }
+
+      async function loadDashboardData() {
+        try {
+          const response = await fetch(`${API_URL}/perc/dashboard`, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            const data = result.data;
+
+            // Mise à jour des infos utilisateur
+            document.getElementById("userName").textContent =
+              data.participant.nom;
+            document.getElementById("userNameNav").textContent =
+              data.participant.nom;
+            document.getElementById("userMatricule").textContent =
+              data.participant.matricule;
+            document.getElementById("userCompte").textContent =
+              data.compte.numero;
+            document.getElementById("userDirection").textContent =
+              data.participant.direction || "N/A";
+
+            // Mise à jour des stats
+            document.getElementById("soldeActuel").textContent = formatCFA(
+              data.compte.solde_actuel
+            );
+            document.getElementById("nombreContributions").textContent =
+              data.statistiques.nombre_contributions;
+            document.getElementById("totalVerse").textContent = formatCFA(
+              data.statistiques.total_verse
+            );
+
+            // Affichage des dernières contributions
+            displayContributions(data.dernieres_contributions);
+          }
+        } catch (error) {
+          console.error("Erreur chargement dashboard:", error);
+        }
+      }
+
+      function displayContributions(contributions) {
+        const container = document.getElementById("contributionsList");
+
+        if (contributions.length === 0) {
+          container.innerHTML =
+            '<p class="text-muted">Aucune contribution enregistrée</p>';
+          return;
+        }
+
+        container.innerHTML = contributions
+          .map(
+            (c) => `
+                <div class="contribution-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${formatCFA(c.montant)}</strong>
+                            <br>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar"></i> ${formatDate(
+                                  c.date_contribution
+                                )}
+                                ${c.periode ? `• Période: ${c.periode}` : ""}
+                            </small>
+                        </div>
+                        <span class="badge bg-success">${
+                          c.type_contribution
+                        }</span>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function formatCFA(amount) {
+        return (
+          new Intl.NumberFormat("fr-FR", {
+            style: "decimal",
+            minimumFractionDigits: 0,
+          }).format(amount) + " F CFA"
+        );
+      }
+
+      function formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString("fr-FR", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        });
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById("loginError");
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+        setTimeout(() => {
+          errorDiv.style.display = "none";
+        }, 5000);
+      }
+
+      function backToStep1() {
+        document.getElementById("step2").style.display = "none";
+        document.getElementById("step1").style.display = "block";
+        document.getElementById("otpInput").value = "";
+      }
+
+      function logout() {
+        localStorage.removeItem("percToken");
+        localStorage.removeItem("percUser");
+        authToken = null;
+        showLoginSection();
+      }
+
+      function showAllContributions() {
+        alert("Fonctionnalité en cours de développement");
+      }
+    </script>
+  </body>
+</html>

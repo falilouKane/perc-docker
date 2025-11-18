@@ -1,0 +1,61 @@
+# Fichiers à exclure de l'image Docker
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Environnement
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+QUICKSTART.md
+OVERVIEW.md
+*.md
+
+# Scripts
+install.sh
+*.sh
+
+# Database
+database/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Tests
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Temp
+tmp/
+temp/
+.cache/

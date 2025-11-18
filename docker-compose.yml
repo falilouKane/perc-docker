@@ -1,0 +1,168 @@
+version: "3.8"
+
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: perc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: perc_db
+      POSTGRES_USER: perc_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-perc_secure_password}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U perc_user -d perc_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - perc-network
+
+  # Application Backend Node.js
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: perc-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+
+      # Database
+      DB_USER: perc_user
+      DB_HOST: postgres
+      DB_NAME: perc_db
+      DB_PASSWORD: ${DB_PASSWORD:-perc_secure_password}
+      DB_PORT: 5432
+
+      # Admin
+      ADMIN_MATRICULES: ${ADMIN_MATRICULES:-508924B}
+
+      # SMS
+      SMS_PROVIDER: ${SMS_PROVIDER:-simulated}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER:-}
+
+      # Security
+      JWT_SECRET: ${JWT_SECRET:-change_this_in_production_please}
+      SESSION_DURATION_HOURS: 24
+
+      # CORS
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+
+      # Logs
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    volumes:
+      # En dev, monter le code pour hot reload
+      - ./backend:/app/backend:${VOLUME_MODE:-ro}
+      - ./public:/app/public:ro
+      # Volume pour les uploads temporaires
+      - uploads:/app/uploads
+
+    networks:
+      - perc-network
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000/",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Nginx (optionnel - pour production)
+  nginx:
+    image: nginx:alpine
+    container_name: perc-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./public:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    networks:
+      - perc-network
+    profiles:
+      - production
+
+  # PgAdmin (optionnel - pour gestion BDD)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: perc-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@perc.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_LISTEN_PORT: 5050
+    ports:
+      - "5050:5050"
+    depends_on:
+      - postgres
+    networks:
+      - perc-network
+    profiles:
+      - dev
+      - debug
+
+  # Redis (optionnel - pour cache sessions)
+  redis:
+    image: redis:7-alpine
+    container_name: perc-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - perc-network
+    profiles:
+      - production
+
+# Volumes persistants
+volumes:
+  postgres_data:
+    driver: local
+    name: perc_postgres_data
+
+  redis_data:
+    driver: local
+    name: perc_redis_data
+
+  uploads:
+    driver: local
+    name: perc_uploads
+
+# Réseau
+networks:
+  perc-network:
+    driver: bridge
+    name: perc_network

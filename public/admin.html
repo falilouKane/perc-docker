@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PERC Admin - Import CGF</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        background: #f5f7fa;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background: linear-gradient(180deg, #2c3e50, #34495e);
+        color: white;
+        padding: 20px;
+      }
+
+      .sidebar h4 {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+      }
+
+      .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        padding: 12px 15px;
+        margin: 5px 0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar a:hover,
+      .sidebar a.active {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+      }
+
+      .main-content {
+        margin-left: 270px;
+        padding: 30px;
+      }
+
+      .card-custom {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        margin-bottom: 25px;
+      }
+
+      .upload-zone {
+        border: 3px dashed #3498db;
+        border-radius: 15px;
+        padding: 50px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+      }
+
+      .upload-zone:hover {
+        border-color: #2980b9;
+        background: #e3f2fd;
+      }
+
+      .upload-zone.dragover {
+        border-color: #27ae60;
+        background: #d4edda;
+      }
+
+      .progress-custom {
+        height: 30px;
+        border-radius: 15px;
+        overflow: hidden;
+      }
+
+      .table-custom {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .badge-status {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+      }
+
+      .import-result {
+        background: #f8f9fa;
+        border-left: 4px solid #3498db;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+      }
+
+      .error-item {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 10px 15px;
+        margin: 5px 0;
+        border-radius: 5px;
+      }
+
+      .success-item {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+        padding: 10px 15px;
+        margin: 5px 0;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h4><i class="bi bi-shield-lock"></i> PERC Admin</h4>
+      <a href="#" class="active" onclick="showSection('import')">
+        <i class="bi bi-cloud-upload"></i> Import CGF
+      </a>
+      <a href="#" onclick="showSection('history')">
+        <i class="bi bi-clock-history"></i> Historique
+      </a>
+      <a href="#" onclick="showSection('stats')">
+        <i class="bi bi-graph-up"></i> Statistiques
+      </a>
+      <a href="#" onclick="showSection('participants')">
+        <i class="bi bi-people"></i> Participants
+      </a>
+      <hr style="border-color: rgba(255, 255, 255, 0.2)" />
+      <a href="index.html"> <i class="bi bi-arrow-left"></i> Retour au site </a>
+      <a href="#" onclick="logout()">
+        <i class="bi bi-box-arrow-right"></i> Déconnexion
+      </a>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="main-content">
+      <h2 class="mb-4">Administration PERC</h2>
+
+      <!-- Section Import -->
+      <div id="importSection">
+        <div class="card-custom">
+          <h4><i class="bi bi-cloud-upload"></i> Import Fichier CGF</h4>
+          <p class="text-muted">
+            Importer un fichier Excel ou CSV contenant les contributions PERC
+          </p>
+
+          <div
+            class="upload-zone"
+            id="uploadZone"
+            onclick="document.getElementById('fileInput').click()"
+          >
+            <i
+              class="bi bi-cloud-arrow-up"
+              style="font-size: 4rem; color: #3498db"
+            ></i>
+            <h5 class="mt-3">
+              Cliquez pour sélectionner ou glissez un fichier ici
+            </h5>
+            <p class="text-muted">
+              Formats acceptés : .xlsx, .xls, .csv (Max 10 MB)
+            </p>
+            <input
+              type="file"
+              id="fileInput"
+              accept=".xlsx,.xls,.csv"
+              style="display: none"
+              onchange="handleFileSelect(event)"
+            />
+          </div>
+
+          <div id="fileInfo" style="display: none" class="mt-4">
+            <div class="alert alert-info">
+              <i class="bi bi-file-earmark-spreadsheet"></i>
+              <strong id="fileName"></strong>
+              <span id="fileSize" class="ms-3"></span>
+            </div>
+            <button class="btn btn-primary btn-lg" onclick="uploadFile()">
+              <i class="bi bi-upload"></i> Lancer l'import
+            </button>
+            <button
+              class="btn btn-outline-secondary btn-lg ms-2"
+              onclick="cancelUpload()"
+            >
+              Annuler
+            </button>
+          </div>
+
+          <div id="uploadProgress" style="display: none" class="mt-4">
+            <h6>Import en cours...</h6>
+            <div class="progress progress-custom">
+              <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                id="progressBar"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+
+          <div id="importResults" style="display: none" class="mt-4">
+            <h5>Résultats de l'import</h5>
+            <div class="import-result">
+              <div class="row text-center">
+                <div class="col-md-4">
+                  <h3 class="text-primary"><span id="totalLines">0</span></h3>
+                  <p>Lignes traitées</p>
+                </div>
+                <div class="col-md-4">
+                  <h3 class="text-success"><span id="successCount">0</span></h3>
+                  <p>Succès</p>
+                </div>
+                <div class="col-md-4">
+                  <h3 class="text-warning"><span id="errorCount">0</span></h3>
+                  <p>Erreurs</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="errorDetails" class="mt-3"></div>
+
+            <button class="btn btn-success mt-3" onclick="resetImport()">
+              <i class="bi bi-arrow-repeat"></i> Nouvel import
+            </button>
+          </div>
+        </div>
+
+        <!-- Format attendu -->
+        <div class="card-custom">
+          <h5><i class="bi bi-info-circle"></i> Format du fichier CGF</h5>
+          <p>Le fichier Excel doit contenir les colonnes suivantes :</p>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr>
+                  <th>Matricule</th>
+                  <th>Compte N°</th>
+                  <th>Nom</th>
+                  <th>Direction</th>
+                  <th>E-mail</th>
+                  <th>Tél.</th>
+                  <th>Montant Versé</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>508924B</td>
+                  <td>0182000401</td>
+                  <td>M. EXEMPLE</td>
+                  <td>DOD/DRDP/BUREAU...</td>
+                  <td>email@example.com</td>
+                  <td>77 XXX XX XX</td>
+                  <td>1 562 955</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Historique -->
+      <div id="historySection" style="display: none">
+        <div class="card-custom">
+          <h4><i class="bi bi-clock-history"></i> Historique des imports</h4>
+          <div class="table-responsive">
+            <table class="table table-hover table-custom" id="historyTable">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th>
+                  <th>Fichier</th>
+                  <th>Lignes</th>
+                  <th>Succès</th>
+                  <th>Erreurs</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr>
+                  <td colspan="7" class="text-center">Chargement...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const API_URL = "http://localhost:3000/api";
+      let authToken = localStorage.getItem("percToken");
+      let selectedFile = null;
+
+      // Drag and drop
+      const uploadZone = document.getElementById("uploadZone");
+
+      uploadZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadZone.classList.add("dragover");
+      });
+
+      uploadZone.addEventListener("dragleave", () => {
+        uploadZone.classList.remove("dragover");
+      });
+
+      uploadZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove("dragover");
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      });
+
+      function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+          handleFile(file);
+        }
+      }
+
+      function handleFile(file) {
+        // Vérifier l'extension
+        const validExtensions = [".xlsx", ".xls", ".csv"];
+        const fileExt = file.name
+          .substring(file.name.lastIndexOf("."))
+          .toLowerCase();
+
+        if (!validExtensions.includes(fileExt)) {
+          alert("Format de fichier non supporté. Utilisez .xlsx, .xls ou .csv");
+          return;
+        }
+
+        // Vérifier la taille (max 10 MB)
+        if (file.size > 10 * 1024 * 1024) {
+          alert("Fichier trop volumineux. Maximum 10 MB");
+          return;
+        }
+
+        selectedFile = file;
+
+        // Afficher les infos du fichier
+        document.getElementById("fileName").textContent = file.name;
+        document.getElementById("fileSize").textContent = formatFileSize(
+          file.size
+        );
+        document.getElementById("fileInfo").style.display = "block";
+        document.getElementById("uploadZone").style.display = "none";
+      }
+
+      function cancelUpload() {
+        selectedFile = null;
+        document.getElementById("fileInfo").style.display = "none";
+        document.getElementById("uploadZone").style.display = "block";
+        document.getElementById("fileInput").value = "";
+      }
+
+      async function uploadFile() {
+        if (!selectedFile) return;
+
+        // Afficher la progression
+        document.getElementById("fileInfo").style.display = "none";
+        document.getElementById("uploadProgress").style.display = "block";
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        try {
+          // Simuler une progression
+          let progress = 0;
+          const progressInterval = setInterval(() => {
+            progress += 10;
+            if (progress <= 90) {
+              document.getElementById("progressBar").style.width =
+                progress + "%";
+            }
+          }, 200);
+
+          const response = await fetch(`${API_URL}/import/cgf`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: formData,
+          });
+
+          clearInterval(progressInterval);
+          document.getElementById("progressBar").style.width = "100%";
+
+          const result = await response.json();
+
+          setTimeout(() => {
+            document.getElementById("uploadProgress").style.display = "none";
+            displayImportResults(result);
+          }, 500);
+        } catch (error) {
+          console.error("Erreur upload:", error);
+          alert("Erreur lors de l'import du fichier");
+          document.getElementById("uploadProgress").style.display = "none";
+          cancelUpload();
+        }
+      }
+
+      function displayImportResults(result) {
+        if (!result.success) {
+          alert("Erreur: " + result.message);
+          cancelUpload();
+          return;
+        }
+
+        const data = result.data;
+
+        document.getElementById("totalLines").textContent = data.total_lignes;
+        document.getElementById("successCount").textContent = data.succes;
+        document.getElementById("errorCount").textContent = data.erreurs;
+
+        // Afficher les erreurs s'il y en a
+        const errorDetails = document.getElementById("errorDetails");
+        errorDetails.innerHTML = "";
+
+        if (data.erreurs > 0) {
+          const errors = data.details.filter((d) => d.statut === "ERREUR");
+          errorDetails.innerHTML =
+            '<h6 class="text-warning">Détails des erreurs :</h6>';
+
+          errors.forEach((err) => {
+            errorDetails.innerHTML += `
+                        <div class="error-item">
+                            <strong>Ligne ${err.ligne}</strong> - Matricule: ${err.matricule}
+                            <br><small>${err.erreur}</small>
+                        </div>
+                    `;
+          });
+        }
+
+        document.getElementById("importResults").style.display = "block";
+      }
+
+      function resetImport() {
+        selectedFile = null;
+        document.getElementById("importResults").style.display = "none";
+        document.getElementById("uploadZone").style.display = "block";
+        document.getElementById("fileInput").value = "";
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
+        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+      }
+
+      function showSection(section) {
+        document.getElementById("importSection").style.display = "none";
+        document.getElementById("historySection").style.display = "none";
+
+        if (section === "import") {
+          document.getElementById("importSection").style.display = "block";
+        } else if (section === "history") {
+          document.getElementById("historySection").style.display = "block";
+          loadImportHistory();
+        }
+      }
+
+      async function loadImportHistory() {
+        try {
+          const response = await fetch(`${API_URL}/import/history`, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            displayHistory(result.data);
+          }
+        } catch (error) {
+          console.error("Erreur chargement historique:", error);
+        }
+      }
+
+      function displayHistory(imports) {
+        const tbody = document.getElementById("historyTableBody");
+
+        if (imports.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="7" class="text-center">Aucun import enregistré</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = imports
+          .map(
+            (imp) => `
+                <tr>
+                    <td>${new Date(imp.date_import).toLocaleString(
+                      "fr-FR"
+                    )}</td>
+                    <td>${imp.nom_fichier}</td>
+                    <td>${imp.nombre_lignes}</td>
+                    <td class="text-success">${imp.nombre_succes}</td>
+                    <td class="text-warning">${imp.nombre_erreurs}</td>
+                    <td>
+                        <span class="badge badge-status ${
+                          imp.statut === "complet" ? "bg-success" : "bg-warning"
+                        }">
+                            ${imp.statut}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewImportDetails(${
+                          imp.id
+                        })">
+                            <i class="bi bi-eye"></i> Détails
+                        </button>
+                    </td>
+                </tr>
+            `
+          )
+          .join("");
+      }
+
+      function viewImportDetails(id) {
+        alert("Détails de l'import #" + id + " (fonctionnalité à venir)");
+      }
+
+      function logout() {
+        localStorage.removeItem("percToken");
+        window.location.href = "index.html";
+      }
+
+      // Vérifier l'authentification au chargement
+      window.onload = function () {
+        if (!authToken) {
+          window.location.href = "index.html";
+        }
+      };
+    </script>
+  </body>
+</html>
