@@ -24,6 +24,7 @@
     "express-fileupload": "^1.4.3",
     "dotenv": "^16.3.1",
     "xlsx": "^0.18.5",
+    "bcrypt": "^5.1.1",
     "twilio": "^4.19.0",
     "axios": "^1.6.2"
   },

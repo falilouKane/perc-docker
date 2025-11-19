@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PERC - Connexion Administrateur</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f2f5;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .login-container {
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        max-width: 1200px;
+        width: 100%;
+        display: flex;
+        min-height: 600px;
+      }
+
+      .login-left {
+        flex: 1;
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .login-right {
+        flex: 1;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .login-right::before {
+        content: "";
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -80px;
+        right: -80px;
+      }
+
+      .login-right::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        bottom: -50px;
+        left: -50px;
+      }
+
+      .logo-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+      }
+
+      .logo-brand i {
+        font-size: 2rem;
+        color: #e74c3c;
+      }
+
+      .logo-brand span {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+      }
+
+      .admin-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+      }
+
+      .welcome-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .welcome-subtitle {
+        color: #7f8c8d;
+        margin-bottom: 40px;
+        font-size: 1rem;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+        position: relative;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 500;
+        font-size: 0.95rem;
+      }
+
+      .form-control-custom {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s;
+        background: #f8f9fa;
+      }
+
+      .form-control-custom:focus {
+        outline: none;
+        border-color: #e74c3c;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+      }
+
+      .password-wrapper {
+        position: relative;
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #7f8c8d;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 5px;
+      }
+
+      .password-toggle:hover {
+        color: #e74c3c;
+      }
+
+      .form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #5a6c7d;
+      }
+
+      .remember-me input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #e74c3c;
+      }
+
+      .btn-signin {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .btn-signin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(231, 76, 60, 0.4);
+      }
+
+      .btn-signin:active {
+        transform: translateY(0);
+      }
+
+      .back-link {
+        text-align: center;
+        margin-top: 30px;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+      }
+
+      .back-link a {
+        color: #e74c3c;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .back-link a:hover {
+        text-decoration: underline;
+      }
+
+      .illustration {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+      }
+
+      .illustration i {
+        font-size: 15rem;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .illustration-text {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-top: 20px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .alert-custom {
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .alert-danger {
+        background: #fee;
+        color: #c33;
+        border: 1px solid #fcc;
+      }
+
+      .alert-success {
+        background: #efe;
+        color: #3c3;
+        border: 1px solid #cfc;
+      }
+
+      .alert-warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .dev-info {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 20px;
+        font-size: 0.9rem;
+      }
+
+      .dev-info strong {
+        color: #856404;
+      }
+
+      .dev-info code {
+        background: rgba(0, 0, 0, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+      }
+
+      @media (max-width: 768px) {
+        .login-container {
+          flex-direction: column;
+        }
+
+        .login-right {
+          display: none;
+        }
+
+        .login-left {
+          padding: 40px 30px;
+        }
+
+        .welcome-title {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <!-- Partie gauche - Formulaire -->
+      <div class="login-left">
+        <div class="logo-brand">
+          <i class="bi bi-shield-lock-fill"></i>
+          <span>PERC Admin</span>
+        </div>
+
+        <span class="admin-badge">
+          <i class="bi bi-shield-check"></i> ESPACE ADMINISTRATEUR
+        </span>
+
+        <h1 class="welcome-title">Administration</h1>
+        <p class="welcome-subtitle">
+          Accès sécurisé réservé aux administrateurs
+        </p>
+
+        <form onsubmit="return loginAdmin(event)">
+          <div class="form-group">
+            <label class="form-label">Identifiant</label>
+            <input
+              type="text"
+              class="form-control-custom"
+              id="inputUsername"
+              placeholder="Votre identifiant"
+              required
+              autocomplete="username"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mot de passe</label>
+            <div class="password-wrapper">
+              <input
+                type="password"
+                class="form-control-custom"
+                id="inputPassword"
+                placeholder="Votre mot de passe"
+                required
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePassword()"
+              >
+                <i class="bi bi-eye" id="eyeIcon"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <label class="remember-me">
+              <input type="checkbox" id="rememberMe" />
+              <span>Se souvenir de moi</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-signin">
+            <span id="btnText">Connexion Administrateur</span>
+            <span id="btnLoader" style="display: none"
+              ><span class="spinner"></span
+            ></span>
+          </button>
+        </form>
+
+        <div class="back-link">
+          <i class="bi bi-arrow-left"></i>
+          <a href="index.html">Retour à l'accueil</a>
+        </div>
+
+        <!-- Info dev -->
+        <div class="dev-info" id="devInfo" style="display: none">
+          <strong><i class="bi bi-info-circle"></i> Mode Développement</strong
+          ><br />
+          <small>
+            Identifiant : <code>admin</code><br />
+            Mot de passe : <code>Admin123!</code>
+          </small>
+        </div>
+
+        <!-- Zone d'alerte -->
+        <div id="alertZone"></div>
+      </div>
+
+      <!-- Partie droite - Illustration -->
+      <div class="login-right">
+        <div class="illustration">
+          <i class="bi bi-shield-fill-check"></i>
+          <p class="illustration-text">Gestion Sécurisée</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://localhost:3000/api";
+
+      // Afficher info dev en localhost
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        document.getElementById("devInfo").style.display = "block";
+      }
+
+      function showAlert(message, type = "danger") {
+        const iconMap = {
+          danger: "exclamation-circle-fill",
+          success: "check-circle-fill",
+          warning: "exclamation-triangle-fill",
+        };
+
+        const alertHTML = `
+                <div class="alert-custom alert-${type}">
+                    <i class="bi bi-${iconMap[type]}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+        document.getElementById("alertZone").innerHTML = alertHTML;
+
+        setTimeout(() => {
+          document.getElementById("alertZone").innerHTML = "";
+        }, 5000);
+      }
+
+      function showLoader(show = true) {
+        document.getElementById("btnText").style.display = show
+          ? "none"
+          : "inline";
+        document.getElementById("btnLoader").style.display = show
+          ? "inline"
+          : "none";
+      }
+
+      function togglePassword() {
+        const input = document.getElementById("inputPassword");
+        const icon = document.getElementById("eyeIcon");
+
+        if (input.type === "password") {
+          input.type = "text";
+          icon.classList.remove("bi-eye");
+          icon.classList.add("bi-eye-slash");
+        } else {
+          input.type = "password";
+          icon.classList.remove("bi-eye-slash");
+          icon.classList.add("bi-eye");
+        }
+      }
+
+      async function loginAdmin(event) {
+        event.preventDefault();
+
+        const username = document.getElementById("inputUsername").value.trim();
+        const password = document.getElementById("inputPassword").value;
+
+        if (!username || !password) {
+          showAlert("Veuillez remplir tous les champs");
+          return false;
+        }
+
+        showLoader(true);
+
+        try {
+          const response = await fetch(`${API_BASE}/auth/admin/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const data = await response.json();
+          showLoader(false);
+
+          if (data.success) {
+            // Sauvegarder le token et les infos
+            localStorage.setItem("percAdminToken", data.token);
+            localStorage.setItem("percUserType", "admin");
+            localStorage.setItem("percAdmin", JSON.stringify(data.admin));
+
+            showAlert("Connexion réussie ! Redirection...", "success");
+
+            // Redirection après 1 seconde
+            setTimeout(() => {
+              window.location.href = "admin-dashboard.html";
+            }, 1000);
+          } else {
+            showAlert(data.message || "Identifiant ou mot de passe incorrect");
+          }
+        } catch (error) {
+          showLoader(false);
+          console.error("Erreur:", error);
+          showAlert("Erreur de connexion au serveur");
+        }
+
+        return false;
+      }
+
+      // Vérifier si déjà connecté au chargement
+      window.addEventListener("DOMContentLoaded", function () {
+        const token = localStorage.getItem("percAdminToken");
+        const userType = localStorage.getItem("percUserType");
+
+        if (token && userType === "admin") {
+          // Vérifier la validité du token
+          fetch(`${API_BASE}/auth/verify-token`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.success && data.user_type === "admin") {
+                window.location.href = "admin-dashboard.html";
+              }
+            })
+            .catch(() => {
+              // Token invalide, on reste sur la page de connexion
+              localStorage.removeItem("percAdminToken");
+              localStorage.removeItem("percUserType");
+              localStorage.removeItem("percAdmin");
+            });
+        }
+      });
+
+      // Gestion de la touche Entrée
+      document.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          const form = document.querySelector("form");
+          if (form) {
+            loginAdmin(event);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
