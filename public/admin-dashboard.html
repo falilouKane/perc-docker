@@ -13,6 +13,14 @@
       rel="stylesheet"
     />
     <style>
+      :root {
+        --sidebar-width: 280px;
+        --sidebar-collapsed: 80px;
+        --primary-blue: #0047ab;
+        --secondary-blue: #003380;
+        --accent-orange: #ff4500;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -20,144 +28,380 @@
       }
 
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Inter", "Segoe UI", sans-serif;
         background: #f5f7fa;
-        min-height: 100vh;
+        overflow-x: hidden;
       }
 
-      /* Sidebar */
+      /* ==================== NOUVELLE SIDEBAR MODERNE ==================== */
+
       .sidebar {
         position: fixed;
         left: 0;
         top: 0;
         height: 100vh;
-        width: 260px;
-        background: linear-gradient(180deg, #2c3e50, #34495e);
+        width: var(--sidebar-width);
+        background: linear-gradient(
+          180deg,
+          var(--primary-blue) 0%,
+          var(--secondary-blue) 100%
+        );
         color: white;
-        padding: 20px 0;
-        overflow-y: auto;
+        padding: 0;
         z-index: 1000;
-        transition: all 0.3s;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar.collapsed {
+        width: var(--sidebar-collapsed);
       }
 
       .sidebar-header {
-        padding: 0 20px 20px;
+        padding: 25px 20px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        margin-bottom: 20px;
-      }
-
-      .sidebar-logo {
         display: flex;
         align-items: center;
-        gap: 10px;
-        font-size: 1.5rem;
-        font-weight: 700;
-      }
-
-      .sidebar-logo i {
-        font-size: 2rem;
-      }
-
-      .sidebar-menu {
-        list-style: none;
-        padding: 0;
-      }
-
-      .sidebar-menu li {
-        margin: 5px 0;
-      }
-
-      .sidebar-menu a {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 20px;
-        color: rgba(255, 255, 255, 0.8);
-        text-decoration: none;
+        gap: 15px;
         transition: all 0.3s;
       }
 
-      .sidebar-menu a:hover,
-      .sidebar-menu a.active {
-        background: rgba(255, 255, 255, 0.1);
+      .sidebar.collapsed .sidebar-header {
+        justify-content: center;
+        padding: 25px 10px;
+      }
+
+      .sidebar-logo {
+        width: 50px;
+        height: 50px;
+        flex-shrink: 0;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed .sidebar-logo {
+        width: 40px;
+        height: 40px;
+      }
+
+      .sidebar-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .sidebar-brand {
+        overflow: hidden;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed .sidebar-brand {
+        opacity: 0;
+        width: 0;
+      }
+
+      .sidebar-brand-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+
+      .sidebar-brand-tagline {
+        font-size: 0.8rem;
+        color: var(--accent-orange);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .sidebar-toggle {
+        position: absolute;
+        top: 30px;
+        right: -15px;
+        width: 30px;
+        height: 30px;
+        background: white;
+        border: 2px solid var(--primary-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s;
+        z-index: 10;
+      }
+
+      .sidebar-toggle:hover {
+        transform: scale(1.1);
+        background: var(--primary-blue);
+      }
+
+      .sidebar-toggle i {
+        color: var(--primary-blue);
+        font-size: 1rem;
+        transition: all 0.3s;
+      }
+
+      .sidebar-toggle:hover i {
         color: white;
       }
 
-      .sidebar-menu i {
-        font-size: 1.2rem;
-        width: 24px;
+      .sidebar.collapsed .sidebar-toggle i::before {
+        content: "\\F285";
       }
 
-      /* Main content */
-      .main-content {
-        margin-left: 260px;
+      .sidebar-nav {
+        padding: 20px 0;
+        overflow-y: auto;
+        height: calc(100vh - 180px);
+      }
+
+      .sidebar-nav::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .sidebar-nav::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+      }
+
+      .menu-section {
+        margin-bottom: 30px;
+      }
+
+      .menu-section-title {
+        padding: 0 20px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 600;
+        margin-bottom: 10px;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed .menu-section-title {
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        margin: 0;
+      }
+
+      .menu-item {
+        position: relative;
+        margin: 5px 10px;
+      }
+
+      .menu-item a {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 14px 20px;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sidebar.collapsed .menu-item a {
+        justify-content: center;
+        padding: 14px;
+      }
+
+      .menu-item a::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: var(--accent-orange);
+        transform: scaleY(0);
+        transition: transform 0.3s;
+      }
+
+      .menu-item a:hover,
+      .menu-item a.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        transform: translateX(5px);
+      }
+
+      .sidebar.collapsed .menu-item a:hover,
+      .sidebar.collapsed .menu-item a.active {
+        transform: translateX(0) scale(1.05);
+      }
+
+      .menu-item a.active::before {
+        transform: scaleY(1);
+      }
+
+      .menu-icon {
+        font-size: 1.3rem;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .menu-text {
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed .menu-text {
+        opacity: 0;
+        width: 0;
+      }
+
+      .menu-badge {
+        margin-left: auto;
+        background: var(--accent-orange);
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 12px;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed .menu-badge {
+        opacity: 0;
+        width: 0;
+      }
+
+      .sidebar-footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
         padding: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed .user-profile {
+        justify-content: center;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-orange), #ff6347);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .user-info {
+        flex: 1;
+        overflow: hidden;
+        transition: all 0.3s;
+      }
+
+      .sidebar.collapsed .user-info {
+        opacity: 0;
+        width: 0;
+      }
+
+      .user-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: white;
+        white-space: nowrap;
+      }
+
+      .user-role {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+        white-space: nowrap;
+      }
+
+      .menu-item::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: calc(100% + 15px);
+        top: 50%;
+        transform: translateY(-50%) translateX(-10px);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s;
+        z-index: 1000;
+      }
+
+      .sidebar.collapsed .menu-item:hover::after {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
+
+      /* ==================== MAIN CONTENT ==================== */
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         min-height: 100vh;
+      }
+
+      .sidebar.collapsed ~ .main-content {
+        margin-left: var(--sidebar-collapsed);
       }
 
       /* Navbar */
       .navbar-custom {
         background: white;
-        padding: 15px 30px;
         border-radius: 15px;
+        padding: 15px 25px;
+        margin-bottom: 25px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        margin-bottom: 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
-      .navbar-title h4 {
+      .page-title h2 {
         margin: 0;
         color: #2c3e50;
+        font-size: 1.8rem;
       }
 
-      .navbar-user {
+      .user-info-header {
         display: flex;
         align-items: center;
         gap: 15px;
       }
 
-      .user-info {
+      .user-name-header {
         text-align: right;
       }
 
-      .user-name {
-        font-weight: 600;
-        color: #2c3e50;
-        margin: 0;
-      }
-
-      .user-role {
-        font-size: 0.85rem;
-        color: #7f8c8d;
-        margin: 0;
-      }
-
-      /* Cards */
-      .card-custom {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        margin-bottom: 20px;
-      }
-
-      .card-header-custom {
-        display: flex;
-        justify-content: between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-
-      .card-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: #2c3e50;
-        margin: 0;
-      }
-
-      /* Stats cards */
+      /* Stats Grid */
       .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -170,20 +414,39 @@
         border-radius: 15px;
         padding: 25px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        border-left: 4px solid;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
       }
 
-      .stat-card.primary {
-        border-color: #3498db;
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
       }
-      .stat-card.success {
-        border-color: #27ae60;
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
       }
-      .stat-card.warning {
-        border-color: #f39c12;
+
+      .stat-card.primary::before {
+        background: #3498db;
       }
-      .stat-card.danger {
-        border-color: #e74c3c;
+
+      .stat-card.success::before {
+        background: #2ecc71;
+      }
+
+      .stat-card.warning::before {
+        background: #f39c12;
+      }
+
+      .stat-card.danger::before {
+        background: #e74c3c;
       }
 
       .stat-icon {
@@ -193,7 +456,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
         margin-bottom: 15px;
       }
 
@@ -201,185 +463,85 @@
         background: rgba(52, 152, 219, 0.1);
         color: #3498db;
       }
+
       .stat-card.success .stat-icon {
-        background: rgba(39, 174, 96, 0.1);
-        color: #27ae60;
+        background: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
       }
+
       .stat-card.warning .stat-icon {
         background: rgba(243, 156, 18, 0.1);
         color: #f39c12;
       }
+
       .stat-card.danger .stat-icon {
         background: rgba(231, 76, 60, 0.1);
         color: #e74c3c;
+      }
+
+      .stat-icon i {
+        font-size: 1.8rem;
+      }
+
+      .stat-label {
+        font-size: 0.95rem;
+        color: #7f8c8d;
+        margin-bottom: 8px;
       }
 
       .stat-value {
         font-size: 2rem;
         font-weight: 700;
         color: #2c3e50;
-        margin: 10px 0 5px;
       }
 
-      .stat-label {
-        color: #7f8c8d;
-        font-size: 0.9rem;
+      /* Cards */
+      .card-custom {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
       }
 
-      /* Upload zone */
-      .upload-zone {
+      .card-title {
+        font-size: 1.3rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      /* Import Section */
+      .upload-area {
         border: 3px dashed #3498db;
         border-radius: 15px;
-        padding: 60px 40px;
+        padding: 40px;
         text-align: center;
+        background: rgba(52, 152, 219, 0.05);
+        margin-bottom: 20px;
         cursor: pointer;
         transition: all 0.3s;
-        background: #f8f9fa;
       }
 
-      .upload-zone:hover {
+      .upload-area:hover {
+        background: rgba(52, 152, 219, 0.1);
         border-color: #2980b9;
-        background: #e3f2fd;
-      }
-
-      .upload-zone.dragover {
-        border-color: #27ae60;
-        background: #d4edda;
       }
 
       .upload-icon {
-        font-size: 4rem;
+        font-size: 3rem;
         color: #3498db;
-        margin-bottom: 20px;
-      }
-
-      .upload-text {
-        font-size: 1.2rem;
-        color: #2c3e50;
-        font-weight: 600;
-        margin-bottom: 10px;
-      }
-
-      .upload-hint {
-        color: #7f8c8d;
-        font-size: 0.9rem;
-      }
-
-      /* Progress bar */
-      .progress-custom {
-        height: 30px;
-        border-radius: 15px;
-        background: #e0e0e0;
-        overflow: hidden;
-        margin: 20px 0;
-      }
-
-      .progress-bar-custom {
-        height: 100%;
-        background: linear-gradient(90deg, #3498db, #2ecc71);
-        transition: width 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-      }
-
-      /* Results */
-      .result-box {
-        background: #f8f9fa;
-        border-left: 4px solid #3498db;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 20px 0;
-      }
-
-      .result-stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        text-align: center;
-        margin-top: 20px;
-      }
-
-      .result-stat h3 {
-        font-size: 2rem;
-        margin: 0;
-      }
-
-      .result-stat p {
-        color: #7f8c8d;
-        margin: 5px 0 0;
-      }
-
-      .result-stat.success h3 {
-        color: #27ae60;
-      }
-      .result-stat.error h3 {
-        color: #e74c3c;
-      }
-
-      /* Table */
-      .table-custom {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 10px;
-      }
-
-      .table-custom thead th {
-        background: #f8f9fa;
-        color: #2c3e50;
-        font-weight: 600;
-        padding: 15px;
-        text-align: left;
-        border: none;
-      }
-
-      .table-custom tbody tr {
-        background: white;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      }
-
-      .table-custom tbody td {
-        padding: 15px;
-        border: none;
-      }
-
-      .badge-status {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-      }
-
-      .badge-success {
-        background: #d4edda;
-        color: #27ae60;
-      }
-
-      .badge-warning {
-        background: #fff3cd;
-        color: #f39c12;
-      }
-
-      .badge-danger {
-        background: #f8d7da;
-        color: #e74c3c;
-      }
-
-      /* Buttons */
-      .btn-custom {
-        padding: 12px 25px;
-        border-radius: 10px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s;
+        margin-bottom: 15px;
       }
 
       .btn-primary-custom {
         background: linear-gradient(135deg, #3498db, #2ecc71);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 10px;
         color: white;
+        font-weight: 600;
+        transition: all 0.3s;
       }
 
       .btn-primary-custom:hover {
@@ -387,17 +549,65 @@
         box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
       }
 
-      .btn-danger-custom {
-        background: #e74c3c;
-        color: white;
+      /* Table */
+      table {
+        width: 100%;
+        margin-top: 20px;
       }
 
-      .btn-secondary-custom {
-        background: #95a5a6;
-        color: white;
+      thead th {
+        background: #f8f9fa;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        border: none;
       }
 
-      /* Loader */
+      tbody tr {
+        border-bottom: 1px solid #ecf0f1;
+      }
+
+      tbody td {
+        padding: 15px;
+      }
+
+      .badge-status {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .badge-complet {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .badge-partiel {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      /* Activity List */
+      .activity-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .alert {
+        border-radius: 10px;
+        border-left: 4px solid;
+      }
+
+      .alert-success {
+        border-left-color: #2ecc71;
+      }
+
+      .alert-info {
+        border-left-color: #3498db;
+      }
+
+      /* Loading */
       .spinner {
         width: 40px;
         height: 40px;
@@ -424,11 +634,18 @@
       /* Responsive */
       @media (max-width: 768px) {
         .sidebar {
-          transform: translateX(-100%);
+          width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-brand,
+        .menu-text,
+        .user-info {
+          opacity: 0;
+          width: 0;
         }
 
         .main-content {
-          margin-left: 0;
+          margin-left: var(--sidebar-collapsed);
         }
 
         .stats-grid {
@@ -438,66 +655,89 @@
     </style>
   </head>
   <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
+    <!-- Sidebar Moderne -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="bi bi-chevron-left"></i>
+      </div>
+
       <div class="sidebar-header">
         <div class="sidebar-logo">
-          <i class="bi bi-shield-lock-fill"></i>
-          <span>PERC Admin</span>
+          <img src="LOGO-MDS2.png" alt="Mutuelle des Douanes" />
+        </div>
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-name">Mutuelle des Douanes</div>
+          <div class="sidebar-brand-tagline">
+            La solidarité pour mieux servir
+          </div>
         </div>
       </div>
 
-      <ul class="sidebar-menu">
-        <li>
-          <a href="#" class="active" onclick="showSection('dashboard')">
-            <i class="bi bi-speedometer2"></i>
-            <span>Tableau de bord</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" onclick="showSection('import')">
-            <i class="bi bi-cloud-upload"></i>
-            <span>Import CGF</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" onclick="showSection('history')">
-            <i class="bi bi-clock-history"></i>
-            <span>Historique</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" onclick="showSection('participants')">
-            <i class="bi bi-people"></i>
-            <span>Participants</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" onclick="showSection('stats')">
-            <i class="bi bi-bar-chart"></i>
-            <span>Statistiques</span>
-          </a>
-        </li>
-      </ul>
+      <nav class="sidebar-nav">
+        <div class="menu-section">
+          <div class="menu-section-title">Principal</div>
 
-      <div
-        style="position: absolute; bottom: 20px; width: 100%; padding: 0 20px"
-      >
-        <hr style="border-color: rgba(255, 255, 255, 0.2)" />
-        <a
-          href="#"
-          onclick="logout()"
-          style="
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-          "
-        >
-          <i class="bi bi-box-arrow-right"></i>
-          <span>Déconnexion</span>
-        </a>
+          <div class="menu-item" data-tooltip="Tableau de bord">
+            <a href="#" class="active" onclick="showSection('dashboard')">
+              <i class="bi bi-speedometer2 menu-icon"></i>
+              <span class="menu-text">Tableau de bord</span>
+            </a>
+          </div>
+
+          <div class="menu-item" data-tooltip="Participants">
+            <a href="participants.html">
+              <i class="bi bi-people menu-icon"></i>
+              <span class="menu-text">Participants</span>
+            </a>
+          </div>
+
+          <div class="menu-item" data-tooltip="Import CGF">
+            <a href="#" onclick="showSection('import')">
+              <i class="bi bi-cloud-upload menu-icon"></i>
+              <span class="menu-text">Import CGF</span>
+              <span class="menu-badge">Nouveau</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="menu-section">
+          <div class="menu-section-title">Données</div>
+
+          <div class="menu-item" data-tooltip="Historique">
+            <a href="#" onclick="showSection('history')">
+              <i class="bi bi-clock-history menu-icon"></i>
+              <span class="menu-text">Historique</span>
+            </a>
+          </div>
+
+          <div class="menu-item" data-tooltip="Statistiques">
+            <a href="#" onclick="showSection('stats')">
+              <i class="bi bi-bar-chart-line menu-icon"></i>
+              <span class="menu-text">Statistiques</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="menu-section">
+          <div class="menu-section-title">Système</div>
+
+          <div class="menu-item" data-tooltip="Déconnexion">
+            <a href="#" onclick="logout()">
+              <i class="bi bi-box-arrow-right menu-icon"></i>
+              <span class="menu-text">Déconnexion</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="user-avatar">A</div>
+          <div class="user-info">
+            <div class="user-name">Administrateur</div>
+            <div class="user-role">Gestionnaire PERC</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -505,90 +745,89 @@
     <div class="main-content">
       <!-- Navbar -->
       <div class="navbar-custom">
-        <div class="navbar-title">
-          <h4 id="pageTitle">Tableau de bord</h4>
+        <div class="page-title">
+          <h2>Tableau de bord</h2>
+          <p class="text-muted m-0">
+            Administrateur Principal - Gestionnaire PERC
+          </p>
         </div>
-        <div class="navbar-user">
-          <div class="user-info">
-            <p class="user-name" id="adminName">Administrateur</p>
-            <p class="user-role">Gestionnaire PERC</p>
+        <div class="user-info-header">
+          <div class="user-name-header">
+            <div class="fw-bold">Administrateur Principal</div>
+            <small class="text-muted">Gestionnaire PERC</small>
           </div>
-          <button class="btn btn-danger btn-sm" onclick="logout()">
-            <i class="bi bi-box-arrow-right"></i>
+          <button class="btn btn-sm btn-danger" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
           </button>
         </div>
       </div>
 
-      <!-- SECTION: Dashboard -->
-      <div id="sectionDashboard">
-        <!-- Stats Cards -->
+      <!-- Dashboard Section -->
+      <div id="dashboardSection">
+        <!-- Stats Grid -->
         <div class="stats-grid">
           <div class="stat-card primary">
             <div class="stat-icon">
-              <i class="bi bi-people-fill"></i>
+              <i class="bi bi-people"></i>
             </div>
-            <div class="stat-value" id="statParticipants">0</div>
             <div class="stat-label">Participants actifs</div>
+            <div class="stat-value">125</div>
           </div>
 
           <div class="stat-card success">
             <div class="stat-icon">
-              <i class="bi bi-cash-stack"></i>
+              <i class="bi bi-cash-coin"></i>
             </div>
-            <div class="stat-value" id="statSolde">0 F CFA</div>
             <div class="stat-label">Solde total système</div>
+            <div class="stat-value">156 500 000 F CFA</div>
           </div>
 
           <div class="stat-card warning">
             <div class="stat-icon">
-              <i class="bi bi-calendar-check"></i>
+              <i class="bi bi-graph-up"></i>
             </div>
-            <div class="stat-value" id="statContributions">0</div>
             <div class="stat-label">Contributions ce mois</div>
+            <div class="stat-value">89</div>
           </div>
 
           <div class="stat-card danger">
             <div class="stat-icon">
               <i class="bi bi-cloud-upload"></i>
             </div>
-            <div class="stat-value" id="statImports">0</div>
             <div class="stat-label">Imports effectués</div>
+            <div class="stat-value">12</div>
           </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Activity Recent -->
         <div class="card-custom">
           <h5 class="card-title">Activité récente</h5>
           <p class="text-muted">Dernières opérations système</p>
-          <div id="recentActivity">
+          <div class="activity-list">
             <div class="spinner"></div>
           </div>
         </div>
       </div>
 
-      <!-- SECTION: Import CGF -->
-      <div id="sectionImport" class="hidden">
+      <!-- Import Section -->
+      <div id="importSection" class="hidden">
         <div class="card-custom">
           <h5 class="card-title">
-            <i class="bi bi-cloud-upload"></i> Import Fichier CGF
+            <i class="bi bi-cloud-upload"></i> Import CGF
           </h5>
           <p class="text-muted">
-            Importer les contributions depuis un fichier Excel ou CSV
+            Importer un fichier Excel de contributions CGF
           </p>
 
-          <!-- Upload Zone -->
           <div
-            id="uploadZone"
-            class="upload-zone"
+            class="upload-area"
             onclick="document.getElementById('fileInput').click()"
           >
             <div class="upload-icon">
-              <i class="bi bi-cloud-arrow-up"></i>
+              <i class="bi bi-cloud-upload"></i>
             </div>
-            <div class="upload-text">Glissez votre fichier ici</div>
-            <div class="upload-hint">
-              ou cliquez pour sélectionner (Excel/CSV, max 10 MB)
-            </div>
+            <h5>Glissez-déposez votre fichier ici</h5>
+            <p class="text-muted">ou cliquez pour sélectionner</p>
             <input
               type="file"
               id="fileInput"
@@ -598,458 +837,318 @@
             />
           </div>
 
-          <!-- File Info -->
-          <div id="fileInfo" class="hidden" style="margin-top: 20px">
-            <div class="alert alert-info">
-              <i class="bi bi-file-earmark-spreadsheet"></i>
-              <strong id="fileName"></strong> (<span id="fileSize"></span>)
-            </div>
-            <button
-              class="btn-custom btn-primary-custom"
-              onclick="uploadFile()"
-            >
-              <i class="bi bi-upload"></i> Lancer l'import
-            </button>
-            <button
-              class="btn-custom btn-secondary-custom ms-2"
-              onclick="cancelUpload()"
-            >
-              Annuler
-            </button>
+          <div id="fileInfo" class="alert alert-info hidden">
+            <strong>Fichier sélectionné:</strong> <span id="fileName"></span>
           </div>
 
-          <!-- Progress -->
-          <div id="uploadProgress" class="hidden">
-            <h6>Import en cours...</h6>
-            <div class="progress-custom">
+          <button
+            class="btn btn-primary-custom"
+            onclick="uploadFile()"
+            disabled
+            id="uploadBtn"
+          >
+            <i class="bi bi-upload"></i> Lancer l'import
+          </button>
+
+          <div id="importProgress" class="hidden mt-3">
+            <div class="progress">
               <div
-                class="progress-bar-custom"
+                class="progress-bar progress-bar-striped progress-bar-animated"
                 id="progressBar"
                 style="width: 0%"
-              >
-                0%
-              </div>
+              ></div>
             </div>
+            <p class="text-center mt-2" id="progressText">Import en cours...</p>
           </div>
 
-          <!-- Results -->
-          <div id="importResults" class="hidden">
-            <h5>Résultats de l'import</h5>
-            <div class="result-box">
-              <div class="result-stats">
-                <div class="result-stat">
-                  <h3 id="totalLines">0</h3>
-                  <p>Lignes traitées</p>
-                </div>
-                <div class="result-stat success">
-                  <h3 id="successCount">0</h3>
-                  <p>Succès</p>
-                </div>
-                <div class="result-stat error">
-                  <h3 id="errorCount">0</h3>
-                  <p>Erreurs</p>
-                </div>
-              </div>
-            </div>
-            <div id="errorDetails"></div>
-            <button
-              class="btn-custom btn-primary-custom mt-3"
-              onclick="resetImport()"
-            >
-              <i class="bi bi-arrow-repeat"></i> Nouvel import
-            </button>
-          </div>
-        </div>
-
-        <!-- Format Info -->
-        <div class="card-custom mt-4">
-          <h5 class="card-title">
-            <i class="bi bi-info-circle"></i> Format du fichier
-          </h5>
-          <p class="text-muted">
-            Le fichier Excel doit contenir les colonnes suivantes :
-          </p>
-          <div class="table-responsive">
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Matricule</th>
-                  <th>Compte N°</th>
-                  <th>Nom</th>
-                  <th>Direction</th>
-                  <th>E-mail</th>
-                  <th>Tél.</th>
-                  <th>Montant Versé</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>508924B</td>
-                  <td>0182000401</td>
-                  <td>M. EXEMPLE</td>
-                  <td>DOD/DRDP/...</td>
-                  <td>email@example.com</td>
-                  <td>77 XXX XX XX</td>
-                  <td>1 562 955</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <div id="importResult" class="hidden mt-3"></div>
         </div>
       </div>
 
-      <!-- SECTION: History -->
-      <div id="sectionHistory" class="hidden">
+      <!-- History Section -->
+      <div id="historySection" class="hidden">
         <div class="card-custom">
           <h5 class="card-title">
             <i class="bi bi-clock-history"></i> Historique des imports
           </h5>
-          <div id="historyList">
-            <div class="spinner"></div>
-          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Fichier</th>
+                <th>Lignes</th>
+                <th>Succès</th>
+                <th>Erreurs</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable">
+              <tr>
+                <td colspan="6" class="text-center">
+                  <div class="spinner"></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- SECTION: Participants -->
-      <div id="sectionParticipants" class="hidden">
-        <div class="card-custom">
-          <h5 class="card-title">
-            <i class="bi bi-people"></i> Liste des participants
-          </h5>
-          <div class="mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="searchInput"
-              placeholder="Rechercher par matricule ou nom..."
-            />
-          </div>
-          <div id="participantsList">
-            <div class="spinner"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECTION: Stats -->
-      <div id="sectionStats" class="hidden">
+      <!-- Stats Section -->
+      <div id="statsSection" class="hidden">
         <div class="card-custom">
           <h5 class="card-title">
             <i class="bi bi-bar-chart"></i> Statistiques détaillées
           </h5>
-          <p class="text-muted">Analyses et rapports du système PERC</p>
-          <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> Section en cours de développement
-          </div>
+          <p class="text-muted">Vue d'ensemble des données PERC</p>
+          <p>Section en construction...</p>
         </div>
       </div>
     </div>
-    <script>
-      const API_BASE = "http://localhost:3000/api";
-      const token = localStorage.getItem("percAdminToken");
-      let selectedFile = null;
 
-      // Vérifier auth au chargement
-      if (!token) {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Toggle Sidebar
+      function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("collapsed");
+        localStorage.setItem(
+          "sidebarCollapsed",
+          sidebar.classList.contains("collapsed")
+        );
+      }
+
+      // Restaurer état sidebar
+      window.addEventListener("DOMContentLoaded", () => {
+        const isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
+        if (isCollapsed) {
+          document.getElementById("sidebar").classList.add("collapsed");
+        }
+      });
+
+      // Vérification auth
+      if (!localStorage.getItem("percAdminToken")) {
         window.location.href = "admin-login.html";
       }
 
-      // Charger les infos admin
-      const adminData = JSON.parse(localStorage.getItem("percAdmin") || "{}");
-      if (adminData.nom_complet) {
-        document.getElementById("adminName").textContent =
-          adminData.nom_complet;
-      }
-
-      // Navigation
+      // Navigation sections
       function showSection(section) {
-        // Cacher toutes les sections
-        ["Dashboard", "Import", "History", "Participants", "Stats"].forEach(
-          (s) => {
-            document.getElementById("section" + s).classList.add("hidden");
-          }
-        );
+        ["dashboard", "import", "history", "stats"].forEach((s) => {
+          document.getElementById(s + "Section").classList.add("hidden");
+        });
 
-        // Afficher la section demandée
-        const sectionElement = document.getElementById(
-          "section" + section.charAt(0).toUpperCase() + section.slice(1)
-        );
-        sectionElement.classList.remove("hidden");
-
-        // Mettre à jour le menu actif
         document
-          .querySelectorAll(".sidebar-menu a")
+          .querySelectorAll(".menu-item a")
           .forEach((a) => a.classList.remove("active"));
         event.target.closest("a").classList.add("active");
 
-        // Mettre à jour le titre
-        const titles = {
-          dashboard: "Tableau de bord",
-          import: "Import CGF",
-          history: "Historique des imports",
-          participants: "Participants",
-          stats: "Statistiques",
-        };
-        document.getElementById("pageTitle").textContent = titles[section];
+        document.getElementById(section + "Section").classList.remove("hidden");
 
-        // Charger les données si nécessaire
-        if (section === "dashboard") loadDashboard();
-        if (section === "history") loadHistory();
-        if (section === "participants") loadParticipants();
-      }
-
-      // Charger dashboard
-      async function loadDashboard() {
-        try {
-          // Simuler le chargement des stats (à remplacer par vraies API calls)
-          document.getElementById("statParticipants").textContent = "125";
-          document.getElementById("statSolde").textContent =
-            "156 500 000 F CFA";
-          document.getElementById("statContributions").textContent = "89";
-          document.getElementById("statImports").textContent = "12";
-
-          document.getElementById("recentActivity").innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="bi bi-check-circle"></i> Import réussi - 45 contributions ajoutées (Il y a 2 heures)
-                    </div>
-                    <div class="alert alert-info">
-                        <i class="bi bi-person-plus"></i> Nouveau participant ajouté: M. DIALLO (Il y a 5 heures)
-                    </div>
-                `;
-        } catch (error) {
-          console.error("Erreur chargement dashboard:", error);
+        if (section === "history") {
+          loadHistory();
+        } else if (section === "dashboard") {
+          loadDashboard();
         }
       }
 
-      // Drag & Drop
-      const uploadZone = document.getElementById("uploadZone");
-
-      uploadZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        uploadZone.classList.add("dragover");
-      });
-
-      uploadZone.addEventListener("dragleave", () => {
-        uploadZone.classList.remove("dragover");
-      });
-
-      uploadZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        uploadZone.classList.remove("dragover");
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-          handleFile(files[0]);
-        }
-      });
+      // File handling
+      let selectedFile = null;
 
       function handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (file) handleFile(file);
-      }
-
-      function handleFile(file) {
-        const validExts = [".xlsx", ".xls", ".csv"];
-        const fileExt = file.name
-          .substring(file.name.lastIndexOf("."))
-          .toLowerCase();
-
-        if (!validExts.includes(fileExt)) {
-          alert("Format non supporté. Utilisez .xlsx, .xls ou .csv");
-          return;
+        selectedFile = event.target.files[0];
+        if (selectedFile) {
+          document.getElementById("fileName").textContent = selectedFile.name;
+          document.getElementById("fileInfo").classList.remove("hidden");
+          document.getElementById("uploadBtn").disabled = false;
         }
-
-        if (file.size > 10 * 1024 * 1024) {
-          alert("Fichier trop volumineux. Maximum 10 MB");
-          return;
-        }
-
-        selectedFile = file;
-        document.getElementById("fileName").textContent = file.name;
-        document.getElementById("fileSize").textContent = formatFileSize(
-          file.size
-        );
-        document.getElementById("uploadZone").classList.add("hidden");
-        document.getElementById("fileInfo").classList.remove("hidden");
-      }
-
-      function cancelUpload() {
-        selectedFile = null;
-        document.getElementById("fileInput").value = "";
-        document.getElementById("uploadZone").classList.remove("hidden");
-        document.getElementById("fileInfo").classList.add("hidden");
       }
 
       async function uploadFile() {
         if (!selectedFile) return;
 
-        document.getElementById("fileInfo").classList.add("hidden");
-        document.getElementById("uploadProgress").classList.remove("hidden");
-
         const formData = new FormData();
         formData.append("file", selectedFile);
 
-        try {
-          // Simuler progression
-          let progress = 0;
-          const interval = setInterval(() => {
-            progress += 10;
-            if (progress <= 90) {
-              document.getElementById("progressBar").style.width =
-                progress + "%";
-              document.getElementById("progressBar").textContent =
-                progress + "%";
-            }
-          }, 200);
+        document.getElementById("importProgress").classList.remove("hidden");
+        document.getElementById("uploadBtn").disabled = true;
 
-          const response = await fetch(`${API_BASE}/import/cgf`, {
+        try {
+          const response = await fetch("http://localhost:3000/api/import/cgf", {
             method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("percAdminToken")}`,
+            },
             body: formData,
           });
 
-          clearInterval(interval);
-          document.getElementById("progressBar").style.width = "100%";
-          document.getElementById("progressBar").textContent = "100%";
-
           const result = await response.json();
 
-          setTimeout(() => {
-            document.getElementById("uploadProgress").classList.add("hidden");
-            displayResults(result);
-          }, 500);
+          document.getElementById("importProgress").classList.add("hidden");
+
+          if (result.success) {
+            document.getElementById("importResult").innerHTML = `
+              <div class="alert alert-success">
+                <strong>✅ Import terminé!</strong><br>
+                ${result.stats.valides} lignes importées avec succès<br>
+                ${result.stats.erreurs} erreurs
+              </div>
+            `;
+          } else {
+            document.getElementById("importResult").innerHTML = `
+              <div class="alert alert-danger">
+                <strong>❌ Erreur:</strong> ${result.message}
+              </div>
+            `;
+          }
+
+          document.getElementById("importResult").classList.remove("hidden");
         } catch (error) {
-          console.error("Erreur upload:", error);
-          alert("Erreur lors de l'import");
-          document.getElementById("uploadProgress").classList.add("hidden");
-          cancelUpload();
-        }
-      }
-
-      function displayResults(result) {
-        if (!result.success) {
-          alert("Erreur: " + result.message);
-          cancelUpload();
-          return;
+          console.error("Erreur:", error);
+          document.getElementById("importResult").innerHTML = `
+            <div class="alert alert-danger">
+              <strong>❌ Erreur de connexion</strong>
+            </div>
+          `;
+          document.getElementById("importResult").classList.remove("hidden");
         }
 
-        const data = result.data;
-        document.getElementById("totalLines").textContent = data.total_lignes;
-        document.getElementById("successCount").textContent = data.succes;
-        document.getElementById("errorCount").textContent = data.erreurs;
-
-        // Afficher les erreurs
-        const errorDiv = document.getElementById("errorDetails");
-        errorDiv.innerHTML = "";
-
-        if (data.erreurs > 0) {
-          const errors = data.details.filter((d) => d.statut === "ERREUR");
-          errorDiv.innerHTML =
-            '<h6 class="text-warning mt-3">Détails des erreurs :</h6>';
-
-          errors.forEach((err) => {
-            errorDiv.innerHTML += `
-                        <div class="alert alert-warning">
-                            <strong>Ligne ${err.ligne}</strong> - Matricule: ${err.matricule}<br>
-                            <small>${err.erreur}</small>
-                        </div>
-                    `;
-          });
-        }
-
-        document.getElementById("importResults").classList.remove("hidden");
-      }
-
-      function resetImport() {
         selectedFile = null;
         document.getElementById("fileInput").value = "";
-        document.getElementById("importResults").classList.add("hidden");
-        document.getElementById("uploadZone").classList.remove("hidden");
+        document.getElementById("fileInfo").classList.add("hidden");
       }
 
+      // Load history
       async function loadHistory() {
-        document.getElementById("historyList").innerHTML =
-          '<div class="spinner"></div>';
-
         try {
-          const response = await fetch(`${API_BASE}/import/history`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await fetch(
+            "http://localhost:3000/api/import/history",
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem(
+                  "percAdminToken"
+                )}`,
+              },
+            }
+          );
 
           const result = await response.json();
 
-          if (result.success && result.data.length > 0) {
-            let html =
-              '<table class="table-custom"><thead><tr><th>Date</th><th>Fichier</th><th>Lignes</th><th>Succès</th><th>Erreurs</th><th>Statut</th></tr></thead><tbody>';
-
-            result.data.forEach((imp) => {
-              html += `
-                            <tr>
-                                <td>${new Date(imp.date_import).toLocaleString(
-                                  "fr-FR"
-                                )}</td>
-                                <td>${imp.nom_fichier}</td>
-                                <td>${imp.nombre_lignes}</td>
-                                <td class="text-success">${
-                                  imp.nombre_succes
-                                }</td>
-                                <td class="text-warning">${
-                                  imp.nombre_erreurs
-                                }</td>
-                                <td><span class="badge-status ${
-                                  imp.statut === "complet"
-                                    ? "badge-success"
-                                    : "badge-warning"
-                                }">${imp.statut}</span></td>
-                            </tr>
-                        `;
-            });
-
-            html += "</tbody></table>";
-            document.getElementById("historyList").innerHTML = html;
-          } else {
-            document.getElementById("historyList").innerHTML =
-              '<p class="text-muted">Aucun import enregistré</p>';
+          if (result.success) {
+            const tbody = document.getElementById("historyTable");
+            tbody.innerHTML = result.data
+              .map(
+                (row) => `
+              <tr>
+                <td>${new Date(row.date_import).toLocaleString("fr-FR")}</td>
+                <td>${row.nom_fichier}</td>
+                <td>${row.nombre_lignes}</td>
+                <td>${row.nombre_succes}</td>
+                <td>${row.nombre_erreurs}</td>
+                <td><span class="badge-status badge-${row.statut}">${
+                  row.statut
+                }</span></td>
+              </tr>
+            `
+              )
+              .join("");
           }
         } catch (error) {
-          console.error("Erreur chargement historique:", error);
-          document.getElementById("historyList").innerHTML =
-            '<p class="text-danger">Erreur de chargement</p>';
+          console.error("Erreur:", error);
         }
       }
 
-      async function loadParticipants() {
-        document.getElementById("participantsList").innerHTML =
-          '<div class="spinner"></div>';
-        // Simuler des données (à remplacer par vraie API)
-        setTimeout(() => {
-          document.getElementById("participantsList").innerHTML = `
-                    <table class="table-custom">
-                        <thead><tr><th>Matricule</th><th>Nom</th><th>Compte CGF</th><th>Solde</th></tr></thead>
-                        <tbody>
-                            <tr><td>508924B</td><td>M. ABABACAR DIOP</td><td>0182000401</td><td>1 562 955 F CFA</td></tr>
-                            <tr><td>679594H</td><td>M. ABABACAR SADIKH BA</td><td>0224970401</td><td>700 096 F CFA</td></tr>
-                        </tbody>
-                    </table>
-                `;
-        }, 500);
+      // Load dashboard stats
+      async function loadDashboardStats() {
+        try {
+          const token = localStorage.getItem("percAdminToken");
+          const response = await fetch(
+            "http://localhost:3000/api/stats/dashboard",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          const result = await response.json();
+
+          if (result.success) {
+            const stats = result.data;
+            document.querySelector(
+              ".stat-card.primary .stat-value"
+            ).textContent = stats.participants_actifs;
+            document.querySelector(
+              ".stat-card.success .stat-value"
+            ).textContent =
+              stats.solde_total.toLocaleString("fr-FR") + " F CFA";
+            document.querySelector(
+              ".stat-card.warning .stat-value"
+            ).textContent = stats.contributions_mois;
+            document.querySelector(
+              ".stat-card.danger .stat-value"
+            ).textContent = stats.imports_effectues;
+          }
+        } catch (error) {
+          console.error("Erreur stats:", error);
+        }
       }
 
-      function formatFileSize(bytes) {
-        if (bytes < 1024) return bytes + " B";
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
-        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+      async function loadRecentActivity() {
+        try {
+          const token = localStorage.getItem("percAdminToken");
+          const response = await fetch(
+            "http://localhost:3000/api/stats/recent-activity",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const result = await response.json();
+
+          const container = document.querySelector(".activity-list");
+          if (result.success) {
+            container.innerHTML = result.data
+              .map(
+                (a) => `
+              <div class="alert alert-${
+                a.type === "import" ? "success" : "info"
+              } mb-2">
+                  ${a.message} (${a.time})
+              </div>
+          `
+              )
+              .join("");
+          }
+        } catch (error) {
+          console.error("Erreur activité:", error);
+        }
       }
 
+      function loadDashboard() {
+        loadDashboardStats();
+        loadRecentActivity();
+      }
+
+      // Init
+      document.addEventListener("DOMContentLoaded", () => {
+        loadDashboard();
+      });
+
+      setInterval(() => {
+        if (
+          !document
+            .getElementById("dashboardSection")
+            .classList.contains("hidden")
+        ) {
+          loadDashboardStats();
+          loadRecentActivity();
+        }
+      }, 30000);
+
+      // Logout
       function logout() {
-        if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
+        if (confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
           localStorage.removeItem("percAdminToken");
-          localStorage.removeItem("percUserType");
-          localStorage.removeItem("percAdmin");
+          localStorage.removeItem("sidebarCollapsed");
           window.location.href = "admin-login.html";
         }
       }
-
-      // Charger le dashboard au démarrage
-      loadDashboard();
     </script>
   </body>
 </html>

@@ -20,10 +20,12 @@ app.use(express.static('public'));
 const authRoutes = require('./routes/auth');
 const percRoutes = require('./routes/perc');
 const importRoutes = require('./routes/import');
+const statsRoutes = require('./routes/stats');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/perc', percRoutes);
 app.use('/api/import', importRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Route racine - Page d'accueil
 app.get('/', (req, res) => {

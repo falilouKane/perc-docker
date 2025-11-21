@@ -1,9 +1,9 @@
-// utils/excelParser.js - Parser AMÉLIORÉ V2 - Accepte montants à 0
+// utils/excelParser.js - Parser AMÉLIORÉ pour fichiers Excel/CSV CGF
 const XLSX = require('xlsx');
 
 /**
  * Parse un fichier Excel ou CSV et retourne un tableau d'objets
- * VERSION 2 : Accepte les montants à 0 et améliore la tolérance
+ * VERSION AMÉLIORÉE : Plus tolérant, ne bloque pas pour des erreurs mineures
  */
 function parseExcelFile(fileBuffer) {
     try {
@@ -64,11 +64,10 @@ function parseExcelFile(fileBuffer) {
                     throw new Error(`Numéro de compte manquant`);
                 }
 
-                // Validation du montant avec acceptation du 0 ✅
+                // Validation du montant avec plus de tolérance
                 const montantParsed = parseFloat(cleanedData.montant);
-                
-                // IMPORTANT: Accepter les montants à 0 !
-                if (cleanedData.montant === '' || isNaN(montantParsed) || montantParsed < 0) {
+                if (!cleanedData.montant || isNaN(montantParsed) || montantParsed < 0) {
+                    // Log détaillé pour debug
                     console.log(`⚠️ Ligne ${lineNumber}: Montant invalide: "${montant}" → "${cleanedData.montant}"`);
                     throw new Error(`Montant invalide: "${montant}"`);
                 }
@@ -125,22 +124,12 @@ function extractValue(row, possibleKeys) {
 
 /**
  * Nettoie un numéro de téléphone
- * AMÉLIORÉ: Garde les multiples numéros séparés par /
  */
 function cleanPhoneNumber(phone) {
     if (!phone) return '';
 
-    // Si le téléphone contient plusieurs numéros séparés par /, les garder tels quels
-    // Ex: "773181352 / 770147359 / 778070"
-    const phoneStr = String(phone).trim();
-    
-    // Si contient des /, c'est probablement plusieurs numéros
-    if (phoneStr.includes('/')) {
-        return phoneStr; // Garder tel quel
-    }
-
-    // Sinon, nettoyer normalement
-    let cleaned = phoneStr.replace(/[^\d+]/g, '');
+    // Enlever tous les caractères non numériques sauf le +
+    let cleaned = String(phone).replace(/[^\d+]/g, '');
 
     // Si commence par 00, remplacer par +
     if (cleaned.startsWith('00')) {
@@ -157,22 +146,15 @@ function cleanPhoneNumber(phone) {
 
 /**
  * Nettoie un montant - VERSION AMÉLIORÉE
- * ACCEPTE maintenant les montants à 0 ✅
  */
 function cleanMontant(montant) {
-    if (!montant && montant !== 0) return '';
+    if (!montant) return '';
 
     // Convertir en string
     let cleaned = String(montant).trim();
 
     // Si vide après trim
-    if (!cleaned) {
-        // Si c'est exactement 0, retourner "0"
-        if (montant === 0 || montant === '0') {
-            return '0';
-        }
-        return '';
-    }
+    if (!cleaned) return '';
 
     // Enlever les espaces (y compris espaces insécables)
     cleaned = cleaned.replace(/\s+/g, '');

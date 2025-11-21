@@ -1,10 +1,10 @@
-// middleware/adminAuth.js - Middleware pour les admins (CORRIGÉ)
+// middleware/auth.js - Middleware d'authentification (CORRIGÉ)
 const { query } = require('../config/database');
 
 /**
- * Middleware pour vérifier les droits administrateur
+ * Middleware pour vérifier le token de session
  */
-async function adminAuthMiddleware(req, res, next) {
+async function authMiddleware(req, res, next) {
     try {
         // Récupérer le token du header Authorization
         const authHeader = req.headers.authorization;
@@ -20,13 +20,12 @@ async function adminAuthMiddleware(req, res, next) {
 
         // Vérifier le token en base de données
         const result = await query(
-            `SELECT s.*, a.username, a.nom_complet, a.email, a.role 
+            `SELECT s.*, p.matricule, p.nom, p.email 
              FROM perc_sessions s
-             JOIN perc_admins a ON s.user_id = a.username
+             JOIN perc_participants p ON s.user_id = p.matricule
              WHERE s.token = $1 
-             AND s.user_type = 'admin'
-             AND s.date_expiration > NOW()
-             AND a.actif = TRUE`,
+             AND s.user_type = 'agent'
+             AND s.date_expiration > NOW()`,
             [token]
         );
 
@@ -37,22 +36,18 @@ async function adminAuthMiddleware(req, res, next) {
             });
         }
 
-        const admin = result.rows[0];
-
-        // Ajouter les infos admin à la requête
+        // Ajouter les infos utilisateur à la requête
         req.user = {
-            username: admin.username,
-            nom: admin.nom_complet,
-            email: admin.email,
-            role: admin.role,
-            sessionId: admin.id,
-            isAdmin: true
+            matricule: result.rows[0].matricule,
+            nom: result.rows[0].nom,
+            email: result.rows[0].email,
+            sessionId: result.rows[0].id
         };
 
         next();
 
     } catch (error) {
-        console.error('Erreur middleware admin:', error);
+        console.error('Erreur middleware auth:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur d\'authentification'
@@ -60,4 +55,4 @@ async function adminAuthMiddleware(req, res, next) {
     }
 }
 
-module.exports = adminAuthMiddleware;
+module.exports = authMiddleware;

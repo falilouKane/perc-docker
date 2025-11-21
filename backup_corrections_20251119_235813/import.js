@@ -1,4 +1,4 @@
-// routes/import.js - Routes d'import des fichiers CGF (AMÉLIORÉ)
+// routes/import.js - Routes d'import des fichiers CGF
 const express = require('express');
 const router = express.Router();
 const { query, transaction } = require('../config/database');
@@ -19,9 +19,7 @@ router.post('/cgf', async (req, res) => {
         }
 
         const file = req.files.file;
-        const importedBy = req.user?.username || 'admin';
-
-        console.log(`📥 Début import: ${file.name} par ${importedBy}`);
+        const importedBy = req.user?.matricule || 'admin';
 
         // Vérifier l'extension du fichier
         const validExtensions = ['.xlsx', '.xls', '.csv'];
@@ -34,21 +32,15 @@ router.post('/cgf', async (req, res) => {
             });
         }
 
-        // Parser le fichier Excel/CSV - VERSION AMÉLIORÉE
-        const parseResult = parseExcelFile(file.data);
+        // Parser le fichier Excel/CSV
+        const parsedData = await parseExcelFile(file.data);
 
-        if (!parseResult.success || !parseResult.data || parseResult.data.length === 0) {
+        if (!parsedData || parsedData.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: 'Fichier vide ou format invalide',
-                details: parseResult.errors
+                message: 'Fichier vide ou format invalide'
             });
         }
-
-        const parsedData = parseResult.data;
-        const parseErrors = parseResult.errors || [];
-
-        console.log(`✅ Parsing OK: ${parsedData.length} lignes valides, ${parseErrors.length} erreurs de parsing`);
 
         // Créer un enregistrement d'import
         const importFileResult = await query(
@@ -56,7 +48,7 @@ router.post('/cgf', async (req, res) => {
              (nom_fichier, nombre_lignes, importe_par, statut) 
              VALUES ($1, $2, $3, $4) 
              RETURNING id`,
-            [file.name, parseResult.stats.total, importedBy, 'en_cours']
+            [file.name, parsedData.length, importedBy, 'en_cours']
         );
 
         const importFileId = importFileResult.rows[0].id;
@@ -64,24 +56,13 @@ router.post('/cgf', async (req, res) => {
         // Traiter chaque ligne
         const results = {
             succes: 0,
-            erreurs: parseErrors.length, // Inclure les erreurs de parsing
+            erreurs: 0,
             details: []
         };
 
-        // Ajouter les erreurs de parsing au rapport
-        parseErrors.forEach(err => {
-            results.details.push({
-                ligne: err.ligne,
-                matricule: err.matricule,
-                statut: 'ERREUR_PARSING',
-                erreur: err.erreur
-            });
-        });
-
-        // Traiter les lignes valides
         for (let i = 0; i < parsedData.length; i++) {
             const row = parsedData[i];
-            const rowNumber = row._lineNumber;
+            const rowNumber = i + 2; // +2 car ligne 1 = headers, commence à 2
 
             try {
                 await transaction(async (client) => {
@@ -90,8 +71,12 @@ router.post('/cgf', async (req, res) => {
                         throw new Error('Données manquantes (matricule, compte ou montant)');
                     }
 
-                    // Nettoyer le montant
-                    const montant = parseFloat(row.montant);
+                    // Nettoyer le montant (enlever espaces, remplacer virgule par point)
+                    const montant = parseFloat(
+                        String(row.montant)
+                            .replace(/\s/g, '')
+                            .replace(',', '.')
+                    );
 
                     if (isNaN(montant) || montant <= 0) {
                         throw new Error('Montant invalide');
@@ -113,10 +98,10 @@ router.post('/cgf', async (req, res) => {
                         [
                             row.matricule,
                             row.compte_cgf,
-                            row.nom || 'Nom non fourni',
-                            row.direction || '',
-                            row.email || '',
-                            row.telephone || ''
+                            row.nom,
+                            row.direction,
+                            row.email,
+                            row.telephone
                         ]
                     );
 
@@ -146,7 +131,7 @@ router.post('/cgf', async (req, res) => {
                             participantId,
                             montant,
                             'versement_cgf',
-                            new Date().toISOString().substring(0, 7),
+                            row.periode || new Date().toISOString().substring(0, 7),
                             importFileId
                         ]
                     );
@@ -215,8 +200,6 @@ router.post('/cgf', async (req, res) => {
                     statut: 'ERREUR',
                     erreur: error.message
                 });
-
-                console.error(`❌ Erreur ligne ${rowNumber}:`, error.message);
             }
         }
 
@@ -232,12 +215,10 @@ router.post('/cgf', async (req, res) => {
                 results.succes,
                 results.erreurs,
                 results.erreurs === 0 ? 'complet' : 'partiel',
-                JSON.stringify(results.details.filter(d => d.statut !== 'OK')),
+                JSON.stringify(results.details.filter(d => d.statut === 'ERREUR')),
                 importFileId
             ]
         );
-
-        console.log(`✅ Import terminé: ${results.succes} succès, ${results.erreurs} erreurs`);
 
         res.json({
             success: true,
@@ -245,17 +226,15 @@ router.post('/cgf', async (req, res) => {
             data: {
                 import_id: importFileId,
                 fichier: file.name,
-                total_lignes: parseResult.stats.total,
-                lignes_parsees: parsedData.length,
-                erreurs_parsing: parseErrors.length,
+                total_lignes: parsedData.length,
                 succes: results.succes,
                 erreurs: results.erreurs,
-                details: results.details.filter(d => d.statut !== 'OK').slice(0, 20) // Max 20 premières erreurs
+                details: results.details
             }
         });
 
     } catch (error) {
-        console.error('❌ Erreur import CGF:', error);
+        console.error('Erreur import CGF:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de l\'import du fichier',
@@ -291,7 +270,7 @@ router.get('/history', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Erreur historique imports:', error);
+        console.error('Erreur history:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors du chargement de l\'historique'
@@ -304,12 +283,12 @@ router.get('/:id/details', async (req, res) => {
     try {
         const { id } = req.params;
 
-        const importDetails = await query(
-            `SELECT * FROM perc_import_files WHERE id = $1`,
+        const importFile = await query(
+            'SELECT * FROM perc_import_files WHERE id = $1',
             [id]
         );
 
-        if (importDetails.rows.length === 0) {
+        if (importFile.rows.length === 0) {
             return res.status(404).json({
                 success: false,
                 message: 'Import non trouvé'
@@ -317,20 +296,22 @@ router.get('/:id/details', async (req, res) => {
         }
 
         const rows = await query(
-            `SELECT * FROM perc_import_rows WHERE import_file_id = $1 ORDER BY numero_ligne`,
+            `SELECT * FROM perc_import_rows 
+             WHERE import_file_id = $1 
+             ORDER BY numero_ligne`,
             [id]
         );
 
         res.json({
             success: true,
             data: {
-                import: importDetails.rows[0],
-                rows: rows.rows
+                import: importFile.rows[0],
+                lignes: rows.rows
             }
         });
 
     } catch (error) {
-        console.error('Erreur détails import:', error);
+        console.error('Erreur details:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors du chargement des détails'
