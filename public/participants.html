@@ -453,7 +453,7 @@
       }
 
       .stat-mini-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
         color: white;
         padding: 20px;
         border-radius: 12px;
@@ -461,15 +461,15 @@
       }
 
       .stat-mini-card:nth-child(2) {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background: linear-gradient(135deg, var(--accent-orange) 0%, #ff6347 100%);
       }
 
       .stat-mini-card:nth-child(3) {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #0066cc 100%);
       }
 
       .stat-mini-card:nth-child(4) {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
       }
 
       .stat-mini-label {
@@ -513,7 +513,7 @@
 
       .btn-advanced {
         padding: 12px 20px;
-        background: #3498db;
+        background: var(--primary-blue);
         color: white;
         border: none;
         border-radius: 10px;
@@ -522,7 +522,7 @@
       }
 
       .btn-advanced:hover {
-        background: #2980b9;
+        background: var(--secondary-blue);
       }
 
       /* Advanced search panel */
@@ -635,15 +635,15 @@
       }
 
       .pagination-controls button:hover {
-        background: #3498db;
+        background: var(--primary-blue);
         color: white;
-        border-color: #3498db;
+        border-color: var(--primary-blue);
       }
 
       .pagination-controls button.active {
-        background: #3498db;
+        background: var(--primary-blue);
         color: white;
-        border-color: #3498db;
+        border-color: var(--primary-blue);
       }
 
       .pagination-controls button:disabled {
@@ -660,7 +660,7 @@
 
       /* Modal */
       .modal-header {
-        background: linear-gradient(135deg, #2c3e50, #34495e);
+        background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
         color: white;
       }
 
@@ -676,16 +676,42 @@
 
       .info-value {
         font-size: 1.1rem;
-        color: #2c3e50;
+        color: var(--secondary-blue);
       }
 
       .btn-edit-solde {
-        background: linear-gradient(135deg, #3498db, #2ecc71);
+        background: linear-gradient(135deg, var(--primary-blue), var(--accent-orange));
         color: white;
         border: none;
         padding: 10px 20px;
         border-radius: 8px;
         cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-edit-solde:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 71, 171, 0.3);
+      }
+
+      /* Bootstrap overrides */
+      .btn-primary {
+        background-color: var(--primary-blue) !important;
+        border-color: var(--primary-blue) !important;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--secondary-blue) !important;
+        border-color: var(--secondary-blue) !important;
+      }
+
+      .text-primary {
+        color: var(--primary-blue) !important;
+      }
+
+      .spinner-border.text-primary {
+        border-color: var(--primary-blue);
+        border-right-color: transparent;
       }
 
       /* Loading */
@@ -1370,7 +1396,7 @@
                                 </div>
                                 <div class="info-group">
                                     <div class="info-label">Solde actuel</div>
-                                    <div class="info-value" style="font-size: 1.5rem; color: #27ae60;">
+                                    <div class="info-value" style="font-size: 1.5rem; color: #0047ab; font-weight: 700;">
                                         ${formatNumber(p.solde_actuel || 0)} CFA
                                     </div>
                                 </div>
