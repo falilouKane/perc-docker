@@ -15,7 +15,7 @@
     <style>
       :root {
         --sidebar-width: 280px;
-        --sidebar-collapsed: 80px;
+        --sidebar-collapsed: 72px;
         --primary-blue: #0047ab;
         --secondary-blue: #003380;
         --accent-orange: #ff4500;
@@ -28,12 +28,13 @@
       }
 
       body {
-        font-family: "Inter", "Segoe UI", sans-serif;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
         background: #f5f7fa;
         overflow-x: hidden;
       }
 
-      /* ==================== NOUVELLE SIDEBAR MODERNE ==================== */
+      /* ==================== SIDEBAR PRINCIPALE ==================== */
 
       .sidebar {
         position: fixed;
@@ -47,41 +48,44 @@
           var(--secondary-blue) 100%
         );
         color: white;
-        padding: 0;
+        display: flex;
+        flex-direction: column;
         z-index: 1000;
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow: hidden;
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        transition: width 0.3s ease;
+        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
       }
 
       .sidebar.collapsed {
         width: var(--sidebar-collapsed);
       }
 
+      /* ==================== HEADER AVEC LOGO ==================== */
+
       .sidebar-header {
-        padding: 25px 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 24px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         display: flex;
         align-items: center;
-        gap: 15px;
-        transition: all 0.3s;
+        gap: 14px;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
       }
 
       .sidebar.collapsed .sidebar-header {
+        padding: 24px 12px;
         justify-content: center;
-        padding: 25px 10px;
       }
 
       .sidebar-logo {
-        width: 50px;
-        height: 50px;
+        width: 48px;
+        height: 48px;
         flex-shrink: 0;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
       }
 
       .sidebar.collapsed .sidebar-logo {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
       }
 
       .sidebar-logo img {
@@ -91,8 +95,9 @@
       }
 
       .sidebar-brand {
+        flex: 1;
         overflow: hidden;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
       }
 
       .sidebar.collapsed .sidebar-brand {
@@ -101,61 +106,64 @@
       }
 
       .sidebar-brand-name {
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         font-weight: 700;
         color: white;
-        line-height: 1.2;
+        line-height: 1.3;
         white-space: nowrap;
+        letter-spacing: -0.01em;
       }
 
       .sidebar-brand-tagline {
-        font-size: 0.8rem;
-        color: var(--accent-orange);
+        font-size: 0.75rem;
+        color: hsl(0, 100%, 47%);
         font-weight: 500;
         white-space: nowrap;
+        margin-top: 2px;
       }
+
+      /* ==================== BOUTON TOGGLE ==================== */
 
       .sidebar-toggle {
         position: absolute;
-        top: 30px;
-        right: -15px;
-        width: 30px;
-        height: 30px;
+        top: 32px;
+        right: -14px;
+        width: 28px;
+        height: 28px;
         background: white;
-        border: 2px solid var(--primary-blue);
+        border: none;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s;
+        transition: all 0.2s ease;
         z-index: 10;
       }
 
       .sidebar-toggle:hover {
         transform: scale(1.1);
-        background: var(--primary-blue);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
 
       .sidebar-toggle i {
         color: var(--primary-blue);
-        font-size: 1rem;
-        transition: all 0.3s;
+        font-size: 0.9rem;
+        transition: transform 0.3s ease;
       }
 
-      .sidebar-toggle:hover i {
-        color: white;
+      .sidebar.collapsed .sidebar-toggle i {
+        transform: rotate(180deg);
       }
 
-      .sidebar.collapsed .sidebar-toggle i::before {
-        content: "\\F285";
-      }
+      /* ==================== NAVIGATION ==================== */
 
       .sidebar-nav {
-        padding: 20px 0;
+        flex: 1;
         overflow-y: auto;
-        height: calc(100vh - 180px);
+        overflow-x: hidden;
+        padding: 12px 8px;
       }
 
       .sidebar-nav::-webkit-scrollbar {
@@ -163,23 +171,28 @@
       }
 
       .sidebar-nav::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.2);
         border-radius: 4px;
       }
 
+      .sidebar-nav::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      /* ==================== SECTIONS ==================== */
+
       .menu-section {
-        margin-bottom: 30px;
+        margin-bottom: 24px;
       }
 
       .menu-section-title {
-        padding: 0 20px;
-        font-size: 0.7rem;
+        padding: 0 16px 8px 16px;
+        font-size: 0.75rem;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 1.2px;
         color: rgba(255, 255, 255, 0.5);
         font-weight: 600;
-        margin-bottom: 10px;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
       }
 
       .sidebar.collapsed .menu-section-title {
@@ -189,59 +202,59 @@
         margin: 0;
       }
 
+      /* ==================== MENU ITEMS (STYLE CLAUDE) ==================== */
+
       .menu-item {
         position: relative;
-        margin: 5px 10px;
+        margin: 2px 0;
       }
 
       .menu-item a {
         display: flex;
         align-items: center;
-        gap: 15px;
-        padding: 14px 20px;
-        color: rgba(255, 255, 255, 0.8);
+        gap: 14px;
+        padding: 11px 16px;
+        color: rgba(255, 255, 255, 0.85);
         text-decoration: none;
-        border-radius: 12px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 10px;
+        transition: all 0.2s ease;
         position: relative;
-        overflow: hidden;
       }
 
       .sidebar.collapsed .menu-item a {
         justify-content: center;
-        padding: 14px;
+        padding: 11px 8px;
+        gap: 0;
       }
 
-      .menu-item a::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 3px;
-        background: var(--accent-orange);
-        transform: scaleY(0);
-        transition: transform 0.3s;
+      /* Hover subtil comme Claude */
+      .menu-item a:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: white;
       }
 
-      .menu-item a:hover,
+      /* État actif avec barre latérale */
       .menu-item a.active {
         background: rgba(255, 255, 255, 0.15);
         color: white;
-        transform: translateX(5px);
-      }
-
-      .sidebar.collapsed .menu-item a:hover,
-      .sidebar.collapsed .menu-item a.active {
-        transform: translateX(0) scale(1.05);
+        font-weight: 500;
       }
 
       .menu-item a.active::before {
-        transform: scaleY(1);
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 24px;
+        width: 3px;
+        background: var(--accent-orange);
+        border-radius: 0 2px 2px 0;
       }
 
+      /* Icônes centrées proprement */
       .menu-icon {
-        font-size: 1.3rem;
+        font-size: 1.25rem;
         width: 24px;
         height: 24px;
         display: flex;
@@ -251,10 +264,11 @@
       }
 
       .menu-text {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         font-weight: 500;
         white-space: nowrap;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
+        letter-spacing: -0.01em;
       }
 
       .sidebar.collapsed .menu-text {
@@ -262,15 +276,16 @@
         width: 0;
       }
 
+      /* Badge discret */
       .menu-badge {
         margin-left: auto;
         background: var(--accent-orange);
         color: white;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 700;
-        padding: 3px 8px;
-        border-radius: 12px;
-        transition: all 0.3s;
+        padding: 3px 7px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
       }
 
       .sidebar.collapsed .menu-badge {
@@ -278,25 +293,32 @@
         width: 0;
       }
 
+      /* ==================== FOOTER ADMIN ==================== */
+
       .sidebar-footer {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        padding: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+        padding: 16px 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
       }
 
       .user-profile {
         display: flex;
         align-items: center;
         gap: 12px;
-        transition: all 0.3s;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .user-profile:hover {
+        background: rgba(255, 255, 255, 0.12);
       }
 
       .sidebar.collapsed .user-profile {
         justify-content: center;
+        padding: 10px 8px;
       }
 
       .user-avatar {
@@ -316,7 +338,7 @@
       .user-info {
         flex: 1;
         overflow: hidden;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
       }
 
       .sidebar.collapsed .user-info {
@@ -325,33 +347,36 @@
       }
 
       .user-name {
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         font-weight: 600;
         color: white;
         white-space: nowrap;
+        line-height: 1.3;
       }
 
       .user-role {
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.65);
         white-space: nowrap;
       }
+
+      /* ==================== TOOLTIPS ==================== */
 
       .menu-item::after {
         content: attr(data-tooltip);
         position: absolute;
-        left: calc(100% + 15px);
+        left: calc(100% + 12px);
         top: 50%;
-        transform: translateY(-50%) translateX(-10px);
+        transform: translateY(-50%) translateX(-8px);
         background: rgba(0, 0, 0, 0.9);
         color: white;
-        padding: 8px 12px;
+        padding: 6px 12px;
         border-radius: 6px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         white-space: nowrap;
         opacity: 0;
         pointer-events: none;
-        transition: all 0.3s;
+        transition: all 0.2s ease;
         z-index: 1000;
       }
 
@@ -360,6 +385,56 @@
         transform: translateY(-50%) translateX(0);
       }
 
+      /* ==================== MAIN CONTENT ==================== */
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 28px 32px;
+        transition: margin-left 0.3s ease;
+        min-height: 100vh;
+        max-width: 1600px;
+      }
+
+      .sidebar.collapsed ~ .main-content {
+        margin-left: var(--sidebar-collapsed);
+      }
+
+      /* ==================== RESPONSIVE ==================== */
+
+      @media (max-width: 1200px) {
+        .main-content {
+          max-width: 100%;
+          padding: 24px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-brand,
+        .menu-text,
+        .user-info,
+        .menu-badge,
+        .menu-section-title {
+          opacity: 0;
+          width: 0;
+        }
+
+        .sidebar-header {
+          justify-content: center;
+        }
+
+        .main-content {
+          margin-left: var(--sidebar-collapsed);
+          padding: 20px;
+        }
+
+        .sidebar-toggle {
+          display: none;
+        }
+      }
       /* ==================== MAIN CONTENT ==================== */
 
       .main-content {
@@ -656,11 +731,18 @@
   </head>
   <body>
     <!-- Sidebar Moderne -->
+    <!-- HTML SIDEBAR -->
     <div class="sidebar" id="sidebar">
-      <div class="sidebar-toggle" onclick="toggleSidebar()">
+      <!-- Toggle Button -->
+      <button
+        class="sidebar-toggle"
+        onclick="toggleSidebar()"
+        aria-label="Toggle sidebar"
+      >
         <i class="bi bi-chevron-left"></i>
-      </div>
+      </button>
 
+      <!-- Header avec Logo -->
       <div class="sidebar-header">
         <div class="sidebar-logo">
           <img src="LOGO-MDS2.png" alt="Mutuelle des Douanes" />
@@ -673,7 +755,9 @@
         </div>
       </div>
 
+      <!-- Navigation -->
       <nav class="sidebar-nav">
+        <!-- Section Principale -->
         <div class="menu-section">
           <div class="menu-section-title">Principal</div>
 
@@ -695,11 +779,12 @@
             <a href="#" onclick="showSection('import')">
               <i class="bi bi-cloud-upload menu-icon"></i>
               <span class="menu-text">Import CGF</span>
-              <span class="menu-badge">Nouveau</span>
+              <span class="menu-badge">New</span>
             </a>
           </div>
         </div>
 
+        <!-- Section Données -->
         <div class="menu-section">
           <div class="menu-section-title">Données</div>
 
@@ -718,6 +803,7 @@
           </div>
         </div>
 
+        <!-- Section Système -->
         <div class="menu-section">
           <div class="menu-section-title">Système</div>
 
@@ -730,6 +816,7 @@
         </div>
       </nav>
 
+      <!-- Footer User -->
       <div class="sidebar-footer">
         <div class="user-profile">
           <div class="user-avatar">A</div>
@@ -847,7 +934,7 @@
             disabled
             id="uploadBtn"
           >
-            <i class="bi bi-upload"></i> Lancer l'import
+            <i class="bi bi-arrow-up-circle"></i> Lancer l'import
           </button>
 
           <div id="importProgress" class="hidden mt-3">
@@ -923,6 +1010,22 @@
         if (isCollapsed) {
           document.getElementById("sidebar").classList.add("collapsed");
         }
+
+        // Marquer page active
+        const currentPage =
+          window.location.pathname.split("/").pop() || "admin-dashboard.html";
+        document.querySelectorAll(".menu-item a").forEach((link) => {
+          const href =
+            link.getAttribute("href") || link.getAttribute("onclick");
+          if (
+            href &&
+            (href.includes(currentPage) ||
+              (currentPage.includes("admin-dashboard") &&
+                href.includes("dashboard")))
+          ) {
+            link.classList.add("active");
+          }
+        });
       });
 
       // Vérification auth

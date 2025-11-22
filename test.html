@@ -1,0 +1,563 @@
+<!-- SIDEBAR STYLE CLAUDE - MINIMALISTE ET PROPRE -->
+<style>
+  :root {
+    --sidebar-width: 280px;
+    --sidebar-collapsed: 72px;
+    --primary-blue: #0047ab;
+    --secondary-blue: #003380;
+    --accent-orange: #ff4500;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+    background: #f5f7fa;
+    overflow-x: hidden;
+  }
+
+  /* ==================== SIDEBAR PRINCIPALE ==================== */
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    background: linear-gradient(
+      180deg,
+      var(--primary-blue) 0%,
+      var(--secondary-blue) 100%
+    );
+    color: white;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: width 0.3s ease;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebar.collapsed {
+    width: var(--sidebar-collapsed);
+  }
+
+  /* ==================== HEADER AVEC LOGO ==================== */
+
+  .sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar.collapsed .sidebar-header {
+    padding: 24px 12px;
+    justify-content: center;
+  }
+
+  .sidebar-logo {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar.collapsed .sidebar-logo {
+    width: 44px;
+    height: 44px;
+  }
+
+  .sidebar-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .sidebar-brand {
+    flex: 1;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar.collapsed .sidebar-brand {
+    opacity: 0;
+    width: 0;
+  }
+
+  .sidebar-brand-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1.3;
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+  }
+
+  .sidebar-brand-tagline {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 500;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  /* ==================== BOUTON TOGGLE ==================== */
+
+  .sidebar-toggle {
+    position: absolute;
+    top: 32px;
+    right: -14px;
+    width: 28px;
+    height: 28px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .sidebar-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .sidebar-toggle i {
+    color: var(--primary-blue);
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.collapsed .sidebar-toggle i {
+    transform: rotate(180deg);
+  }
+
+  /* ==================== NAVIGATION ==================== */
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 8px;
+  }
+
+  .sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+
+  .sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* ==================== SECTIONS ==================== */
+
+  .menu-section {
+    margin-bottom: 24px;
+  }
+
+  .menu-section-title {
+    padding: 0 16px 8px 16px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar.collapsed .menu-section-title {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* ==================== MENU ITEMS (STYLE CLAUDE) ==================== */
+
+  .menu-item {
+    position: relative;
+    margin: 2px 0;
+  }
+
+  .menu-item a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 16px;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .sidebar.collapsed .menu-item a {
+    justify-content: center;
+    padding: 11px 8px;
+  }
+
+  /* Hover subtil comme Claude */
+  .menu-item a:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+  }
+
+  /* État actif avec barre latérale */
+  .menu-item a.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-weight: 500;
+  }
+
+  .menu-item a.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 24px;
+    width: 3px;
+    background: var(--accent-orange);
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* Icônes centrées proprement */
+  .menu-icon {
+    font-size: 1.25rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .menu-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    letter-spacing: -0.01em;
+  }
+
+  .sidebar.collapsed .menu-text {
+    opacity: 0;
+    width: 0;
+  }
+
+  /* Badge discret */
+  .menu-badge {
+    margin-left: auto;
+    background: var(--accent-orange);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar.collapsed .menu-badge {
+    opacity: 0;
+    width: 0;
+  }
+
+  /* ==================== FOOTER ADMIN ==================== */
+
+  .sidebar-footer {
+    flex-shrink: 0;
+    padding: 16px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .user-profile:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .sidebar.collapsed .user-profile {
+    justify-content: center;
+    padding: 10px 8px;
+  }
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-orange), #ff6347);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .user-info {
+    flex: 1;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar.collapsed .user-info {
+    opacity: 0;
+    width: 0;
+  }
+
+  .user-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+
+  .user-role {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.65);
+    white-space: nowrap;
+  }
+
+  /* ==================== TOOLTIPS ==================== */
+
+  .menu-item::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-8px);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 1000;
+  }
+
+  .sidebar.collapsed .menu-item:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  /* ==================== MAIN CONTENT ==================== */
+
+  .main-content {
+    margin-left: var(--sidebar-width);
+    padding: 28px 32px;
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+    max-width: 1600px;
+  }
+
+  .sidebar.collapsed ~ .main-content {
+    margin-left: var(--sidebar-collapsed);
+  }
+
+  /* ==================== RESPONSIVE ==================== */
+
+  @media (max-width: 1200px) {
+    .main-content {
+      max-width: 100%;
+      padding: 24px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      width: var(--sidebar-collapsed);
+    }
+
+    .sidebar-brand,
+    .menu-text,
+    .user-info,
+    .menu-badge,
+    .menu-section-title {
+      opacity: 0;
+      width: 0;
+    }
+
+    .sidebar-header {
+      justify-content: center;
+    }
+
+    .main-content {
+      margin-left: var(--sidebar-collapsed);
+      padding: 20px;
+    }
+
+    .sidebar-toggle {
+      display: none;
+    }
+  }
+</style>
+
+<!-- HTML SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <!-- Toggle Button -->
+  <button
+    class="sidebar-toggle"
+    onclick="toggleSidebar()"
+    aria-label="Toggle sidebar"
+  >
+    <i class="bi bi-chevron-left"></i>
+  </button>
+
+  <!-- Header avec Logo -->
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <img src="LOGO-MDS.png" alt="Mutuelle des Douanes" />
+    </div>
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name">Mutuelle des Douanes</div>
+      <div class="sidebar-brand-tagline">La solidarité pour mieux servir</div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <!-- Section Principale -->
+    <div class="menu-section">
+      <div class="menu-section-title">Principal</div>
+
+      <div class="menu-item" data-tooltip="Tableau de bord">
+        <a href="#" class="active" onclick="showSection('dashboard')">
+          <i class="bi bi-speedometer2 menu-icon"></i>
+          <span class="menu-text">Tableau de bord</span>
+        </a>
+      </div>
+
+      <div class="menu-item" data-tooltip="Participants">
+        <a href="participants.html">
+          <i class="bi bi-people menu-icon"></i>
+          <span class="menu-text">Participants</span>
+        </a>
+      </div>
+
+      <div class="menu-item" data-tooltip="Import CGF">
+        <a href="#" onclick="showSection('import')">
+          <i class="bi bi-cloud-upload menu-icon"></i>
+          <span class="menu-text">Import CGF</span>
+          <span class="menu-badge">New</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Section Données -->
+    <div class="menu-section">
+      <div class="menu-section-title">Données</div>
+
+      <div class="menu-item" data-tooltip="Historique">
+        <a href="#" onclick="showSection('history')">
+          <i class="bi bi-clock-history menu-icon"></i>
+          <span class="menu-text">Historique</span>
+        </a>
+      </div>
+
+      <div class="menu-item" data-tooltip="Statistiques">
+        <a href="#" onclick="showSection('stats')">
+          <i class="bi bi-bar-chart-line menu-icon"></i>
+          <span class="menu-text">Statistiques</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Section Système -->
+    <div class="menu-section">
+      <div class="menu-section-title">Système</div>
+
+      <div class="menu-item" data-tooltip="Déconnexion">
+        <a href="#" onclick="logout()">
+          <i class="bi bi-box-arrow-right menu-icon"></i>
+          <span class="menu-text">Déconnexion</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Footer User -->
+  <div class="sidebar-footer">
+    <div class="user-profile">
+      <div class="user-avatar">A</div>
+      <div class="user-info">
+        <div class="user-name">Administrateur</div>
+        <div class="user-role">Gestionnaire PERC</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Toggle Sidebar
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("collapsed");
+    localStorage.setItem(
+      "sidebarCollapsed",
+      sidebar.classList.contains("collapsed")
+    );
+  }
+
+  // Restaurer état
+  window.addEventListener("DOMContentLoaded", () => {
+    const isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
+    if (isCollapsed) {
+      document.getElementById("sidebar").classList.add("collapsed");
+    }
+
+    // Marquer page active
+    const currentPage =
+      window.location.pathname.split("/").pop() || "admin-dashboard.html";
+    document.querySelectorAll(".menu-item a").forEach((link) => {
+      const href = link.getAttribute("href") || link.getAttribute("onclick");
+      if (
+        href &&
+        (href.includes(currentPage) ||
+          (currentPage.includes("admin-dashboard") &&
+            href.includes("dashboard")))
+      ) {
+        link.classList.add("active");
+      }
+    });
+  });
+
+  // Logout
+  function logout() {
+    if (confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
+      localStorage.removeItem("percAdminToken");
+      localStorage.removeItem("sidebarCollapsed");
+      window.location.href = "admin-login.html";
+    }
+  }
+</script>
