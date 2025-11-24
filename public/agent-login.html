@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PERC - Connexion Agent</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-blue: #0047ab;
+        --secondary-blue: #003380;
+        --accent-orange: #ff4500;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .login-container {
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        max-width: 1200px;
+        width: 100%;
+        display: flex;
+        min-height: 600px;
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .login-left {
+        flex: 1;
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .login-right {
+        flex: 1;
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue) 0%,
+          var(--secondary-blue) 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px;
+        position: relative;
+        overflow: hidden;
+        color: white;
+      }
+
+      .login-right::before {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        top: -100px;
+        right: -100px;
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .login-right::after {
+        content: "";
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        bottom: -70px;
+        left: -70px;
+        animation: float 8s ease-in-out infinite reverse;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      .right-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+      }
+
+      .right-icon {
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .right-icon i {
+        font-size: 3.5rem;
+        color: white;
+      }
+
+      .right-content h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: white;
+      }
+
+      .right-content p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        line-height: 1.6;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .logo-brand {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 40px;
+      }
+
+      .logo-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--secondary-blue)
+        );
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 20px rgba(0, 71, 171, 0.3);
+      }
+
+      .logo-icon i {
+        font-size: 2rem;
+        color: white;
+      }
+
+      .logo-text h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--secondary-blue)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+      }
+
+      .logo-text p {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin: 0;
+      }
+
+      .login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--secondary-blue);
+        margin-bottom: 10px;
+      }
+
+      .login-subtitle {
+        color: #7f8c8d;
+        margin-bottom: 40px;
+        font-size: 1.05rem;
+      }
+
+      .alert-container {
+        margin-bottom: 25px;
+        min-height: 60px;
+      }
+
+      .alert-custom {
+        border-radius: 15px;
+        padding: 15px 20px;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.3s ease-out;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .alert-danger {
+        background: linear-gradient(90deg, #fee 0%, #fdd 100%);
+        color: #c33;
+        border-left: 4px solid #e74c3c;
+      }
+
+      .alert-success {
+        background: linear-gradient(90deg, #efe 0%, #dfd 100%);
+        color: #2a7;
+        border-left: 4px solid #27ae60;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--secondary-blue);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .input-wrapper {
+        position: relative;
+      }
+
+      .form-control-custom {
+        width: 100%;
+        padding: 15px 50px 15px 50px;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        font-size: 1rem;
+        transition: all 0.3s;
+        background: #f8f9fa;
+      }
+
+      .form-control-custom:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(0, 71, 171, 0.1);
+      }
+
+      .input-icon-left {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #7f8c8d;
+        font-size: 1.2rem;
+        pointer-events: none;
+      }
+
+      .form-control-custom:focus ~ .input-icon-left {
+        color: var(--primary-blue);
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #7f8c8d;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 5px;
+        transition: color 0.3s;
+      }
+
+      .password-toggle:hover {
+        color: var(--primary-blue);
+      }
+
+      .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .custom-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .custom-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary-blue);
+      }
+
+      .custom-checkbox label {
+        cursor: pointer;
+        color: #666;
+        font-size: 0.9rem;
+        margin: 0;
+      }
+
+      .forgot-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+
+      .forgot-link:hover {
+        color: var(--secondary-blue);
+        text-decoration: underline;
+      }
+
+      .btn-login {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--secondary-blue)
+        );
+        border: none;
+        border-radius: 15px;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 8px 20px rgba(0, 71, 171, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-login::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .btn-login:hover::before {
+        left: 100%;
+      }
+
+      .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 71, 171, 0.4);
+      }
+
+      .btn-login:active {
+        transform: translateY(0);
+      }
+
+      .btn-login:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .divider {
+        text-align: center;
+        margin: 30px 0;
+        position: relative;
+      }
+
+      .divider::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 100%;
+        height: 1px;
+        background: #e0e0e0;
+      }
+
+      .divider span {
+        background: white;
+        padding: 0 15px;
+        color: #999;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .help-text {
+        text-align: center;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+        margin-top: 25px;
+      }
+
+      .help-text a {
+        color: var(--accent-orange);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+      }
+
+      .help-text a:hover {
+        color: #ff6347;
+        text-decoration: underline;
+      }
+
+      /* Responsive */
+      @media (max-width: 968px) {
+        .login-container {
+          flex-direction: column;
+        }
+
+        .login-right {
+          min-height: 300px;
+        }
+
+        .login-left {
+          padding: 40px 30px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .login-left {
+          padding: 30px 20px;
+        }
+
+        .login-title {
+          font-size: 1.6rem;
+        }
+
+        .form-control-custom {
+          padding: 13px 45px 13px 45px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <!-- Left Side - Form -->
+      <div class="login-left">
+        <div class="logo-brand">
+          <div class="logo-icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <div class="logo-text">
+            <h1>PERC</h1>
+            <p>Mutuelle des Douanes</p>
+          </div>
+        </div>
+
+        <h2 class="login-title">Connexion Agent</h2>
+        <p class="login-subtitle">
+          Accédez à votre espace personnel avec votre matricule
+        </p>
+
+        <div class="alert-container" id="alertContainer"></div>
+
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Matricule</label>
+            <div class="input-wrapper">
+              <input
+                type="text"
+                class="form-control-custom"
+                id="matricule"
+                placeholder="Ex: 123456B ou DOUANES:611477J"
+                required
+                autofocus
+              />
+              <i class="bi bi-person-badge input-icon-left"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mot de passe</label>
+            <div class="input-wrapper">
+              <input
+                type="password"
+                class="form-control-custom"
+                id="password"
+                placeholder="Entrez votre mot de passe"
+                required
+              />
+              <i class="bi bi-lock input-icon-left"></i>
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePassword()"
+                id="toggleBtn"
+              >
+                <i class="bi bi-eye" id="toggleIcon"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <div class="custom-checkbox">
+              <input type="checkbox" id="rememberMe" />
+              <label for="rememberMe">Se souvenir de moi</label>
+            </div>
+            <a href="#" class="forgot-link" onclick="showForgotPassword(event)"
+              >Mot de passe oublié ?</a
+            >
+          </div>
+
+          <button type="submit" class="btn-login" id="loginBtn">
+            <span id="btnText">Se connecter</span>
+            <span id="btnLoader" style="display: none"
+              ><span class="spinner"></span
+            ></span>
+          </button>
+        </form>
+
+        <div class="divider">
+          <span>Première connexion ?</span>
+        </div>
+
+        <p class="help-text">
+          Utilisez le mot de passe reçu par SMS ou email.<br />
+          Vous devrez le changer lors de votre première connexion.<br />
+          Besoin d'aide ?
+          <a href="mailto:support@perc.mutuelle.sn">Contactez le support</a>
+        </p>
+      </div>
+
+      <!-- Right Side - Info Panel -->
+      <div class="login-right">
+        <div class="right-content">
+          <div class="right-icon">
+            <i class="bi bi-person-check-fill"></i>
+          </div>
+          <h2>Bienvenue sur votre espace PERC</h2>
+          <p>
+            Accédez à votre compte personnel, consultez votre solde CGF,
+            effectuez vos virements et gérez vos opérations en toute sécurité.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Auto-detect API base URL (localhost or network IP)
+      const API_BASE = window.location.hostname === 'localhost'
+          ? 'http://localhost:3000/api'
+          : `http://${window.location.hostname}:3000/api`;
+
+      function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const toggleIcon = document.getElementById("toggleIcon");
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          toggleIcon.classList.remove("bi-eye");
+          toggleIcon.classList.add("bi-eye-slash");
+        } else {
+          passwordInput.type = "password";
+          toggleIcon.classList.remove("bi-eye-slash");
+          toggleIcon.classList.add("bi-eye");
+        }
+      }
+
+      function showAlert(message, type = "danger") {
+        const alertContainer = document.getElementById("alertContainer");
+        const iconMap = {
+          danger: "exclamation-circle-fill",
+          success: "check-circle-fill",
+        };
+
+        const alertHTML = `
+          <div class="alert-custom alert-${type}">
+            <i class="bi bi-${iconMap[type]}"></i>
+            <span>${message}</span>
+          </div>
+        `;
+
+        alertContainer.innerHTML = alertHTML;
+
+        setTimeout(() => {
+          alertContainer.innerHTML = "";
+        }, 5000);
+      }
+
+      function showLoader(show = true) {
+        document.getElementById("btnText").style.display = show
+          ? "none"
+          : "inline";
+        document.getElementById("btnLoader").style.display = show
+          ? "inline"
+          : "none";
+        document.getElementById("loginBtn").disabled = show;
+      }
+
+      async function handleLogin(event) {
+        event.preventDefault();
+
+        const matricule = document.getElementById("matricule").value.trim();
+        const password = document.getElementById("password").value;
+        const rememberMe = document.getElementById("rememberMe").checked;
+
+        if (!matricule || !password) {
+          showAlert("Veuillez remplir tous les champs");
+          return false;
+        }
+
+        showLoader(true);
+
+        try {
+          const response = await fetch(`${API_BASE}/auth/agent/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ matricule, password }),
+          });
+
+          const data = await response.json();
+          showLoader(false);
+
+          if (data.success) {
+            // Stocker le token
+            localStorage.setItem("percAgentToken", data.token);
+
+            // Stocker les infos utilisateur
+            localStorage.setItem("percAgentUser", JSON.stringify(data.user));
+
+            // Se souvenir de moi
+            if (rememberMe) {
+              localStorage.setItem("percAgentMatricule", matricule);
+            } else {
+              localStorage.removeItem("percAgentMatricule");
+            }
+
+            showAlert("Connexion réussie ! Redirection...", "success");
+
+            // Vérifier si c'est la première connexion
+            setTimeout(() => {
+              if (data.user.first_login_done === false || data.user.password_set === false) {
+                // Première connexion : rediriger vers changement de mot de passe
+                window.location.href = "change-password.html";
+              } else {
+                // Connexion normale : rediriger vers le dashboard
+                window.location.href = "agent-dashboard.html";
+              }
+            }, 1000);
+          } else {
+            // Gérer les différents types d'erreurs
+            let errorMessage = data.message || "Erreur de connexion";
+
+            if (
+              errorMessage.includes("Matricule") ||
+              errorMessage.includes("matricule")
+            ) {
+              errorMessage =
+                "Matricule incorrect. Vérifiez votre matricule et réessayez.";
+            } else if (
+              errorMessage.includes("mot de passe") ||
+              errorMessage.includes("password")
+            ) {
+              errorMessage =
+                "Mot de passe incorrect. Vérifiez votre mot de passe et réessayez.";
+            }
+
+            showAlert(errorMessage);
+          }
+        } catch (error) {
+          showLoader(false);
+          console.error("Erreur de connexion:", error);
+          showAlert(
+            "Impossible de se connecter au serveur. Vérifiez votre connexion internet."
+          );
+        }
+
+        return false;
+      }
+
+      function showForgotPassword(event) {
+        event.preventDefault();
+        showAlert(
+          "Contactez le support PERC au +221 XX XXX XX XX ou par email à support@perc.mutuelle.sn pour réinitialiser votre mot de passe.",
+          "success"
+        );
+      }
+
+      // Pré-remplir le matricule si "Se souvenir de moi" était coché
+      window.addEventListener("DOMContentLoaded", function () {
+        const savedMatricule = localStorage.getItem("percAgentMatricule");
+        if (savedMatricule) {
+          document.getElementById("matricule").value = savedMatricule;
+          document.getElementById("rememberMe").checked = true;
+        }
+
+        // Si déjà connecté, rediriger
+        const token = localStorage.getItem("percAgentToken");
+        if (token) {
+          // Vérifier si le token est valide (optionnel)
+          window.location.href = "agent-dashboard.html";
+        }
+      });
+    </script>
+  </body>
+</html>

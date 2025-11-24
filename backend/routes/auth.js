@@ -244,8 +244,8 @@ router.post('/agent/login', async (req, res) => {
 
         const participant = result.rows[0];
 
-        // Vérifier si un mot de passe est défini
-        if (!participant.password_set || !participant.password_hash) {
+        // Vérifier si un mot de passe hashé existe
+        if (!participant.password_hash) {
             return res.status(400).json({
                 success: false,
                 message: 'Vous devez d\'abord définir un mot de passe',
@@ -253,7 +253,7 @@ router.post('/agent/login', async (req, res) => {
             });
         }
 
-        // Vérifier le mot de passe
+        // Vérifier le mot de passe (autorise la connexion même si password_set = FALSE)
         const passwordMatch = await bcrypt.compare(password, participant.password_hash);
 
         if (!passwordMatch) {
@@ -311,7 +311,9 @@ router.post('/agent/login', async (req, res) => {
                 nom: fullData.rows[0].nom,
                 email: fullData.rows[0].email,
                 compte_cgf: fullData.rows[0].compte_cgf,
-                solde: fullData.rows[0].solde_actuel
+                solde: fullData.rows[0].solde_actuel,
+                first_login_done: fullData.rows[0].first_login_done,
+                password_set: fullData.rows[0].password_set
             }
         });
 
@@ -468,6 +470,195 @@ router.get('/verify-token', async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la vérification du token'
+        });
+    }
+});
+
+// POST /api/auth/agent/change-password
+// Changer le mot de passe (authentifié)
+router.post('/agent/change-password', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        const { currentPassword, newPassword } = req.body;
+
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: 'Non authentifié'
+            });
+        }
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Mot de passe actuel et nouveau mot de passe requis'
+            });
+        }
+
+        // Valider le nouveau mot de passe
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le nouveau mot de passe doit contenir au moins 6 caractères'
+            });
+        }
+
+        // Vérifier la session
+        const sessionResult = await query(
+            `SELECT * FROM perc_sessions WHERE token = $1 AND date_expiration > NOW()`,
+            [token]
+        );
+
+        if (sessionResult.rows.length === 0) {
+            return res.status(401).json({
+                success: false,
+                message: 'Session invalide ou expirée'
+            });
+        }
+
+        const matricule = sessionResult.rows[0].user_id;
+
+        // Récupérer le participant
+        const participantResult = await query(
+            'SELECT * FROM perc_participants WHERE matricule = $1',
+            [matricule]
+        );
+
+        if (participantResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Participant non trouvé'
+            });
+        }
+
+        const participant = participantResult.rows[0];
+
+        // Vérifier le mot de passe actuel
+        const passwordMatch = await bcrypt.compare(currentPassword, participant.password_hash);
+
+        if (!passwordMatch) {
+            return res.status(401).json({
+                success: false,
+                message: 'Mot de passe actuel incorrect'
+            });
+        }
+
+        // Hasher le nouveau mot de passe
+        const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+        // Mettre à jour le mot de passe
+        await query(
+            `UPDATE perc_participants
+             SET password_hash = $1,
+                 password_set = TRUE,
+                 first_login_done = TRUE
+             WHERE matricule = $2`,
+            [newPasswordHash, matricule]
+        );
+
+        res.json({
+            success: true,
+            message: 'Mot de passe modifié avec succès'
+        });
+
+    } catch (error) {
+        console.error('Erreur change-password:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la modification du mot de passe'
+        });
+    }
+});
+
+// POST /api/auth/admin/reset-password
+// Réinitialiser le mot de passe d'un agent (admin uniquement)
+router.post('/admin/reset-password', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        const { matricule, newPassword } = req.body;
+
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: 'Non authentifié'
+            });
+        }
+
+        if (!matricule || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Matricule et nouveau mot de passe requis'
+            });
+        }
+
+        // Valider le nouveau mot de passe
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le nouveau mot de passe doit contenir au moins 6 caractères'
+            });
+        }
+
+        // Vérifier que c'est bien un admin
+        const sessionResult = await query(
+            `SELECT * FROM perc_sessions
+             WHERE token = $1
+             AND user_type = 'admin'
+             AND date_expiration > NOW()`,
+            [token]
+        );
+
+        if (sessionResult.rows.length === 0) {
+            return res.status(403).json({
+                success: false,
+                message: 'Accès refusé - Administrateur uniquement'
+            });
+        }
+
+        // Vérifier que le participant existe
+        const participantResult = await query(
+            'SELECT * FROM perc_participants WHERE matricule = $1',
+            [matricule]
+        );
+
+        if (participantResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Participant non trouvé'
+            });
+        }
+
+        // Hasher le nouveau mot de passe
+        const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+        // Réinitialiser le mot de passe et forcer le changement à la prochaine connexion
+        await query(
+            `UPDATE perc_participants
+             SET password_hash = $1,
+                 password_set = FALSE,
+                 first_login_done = FALSE
+             WHERE matricule = $2`,
+            [newPasswordHash, matricule]
+        );
+
+        // Supprimer toutes les sessions actives de cet agent
+        await query(
+            `DELETE FROM perc_sessions
+             WHERE user_type = 'agent'
+             AND user_id = $1`,
+            [matricule]
+        );
+
+        res.json({
+            success: true,
+            message: 'Mot de passe réinitialisé avec succès. L\'agent devra le changer à la prochaine connexion.'
+        });
+
+    } catch (error) {
+        console.error('Erreur reset-password:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la réinitialisation du mot de passe'
         });
     }
 });

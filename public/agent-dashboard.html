@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0047ab">
+    <title>Mon Compte PERC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0047ab;
+            --dark-blue: #003380;
+            --accent-orange: #ff4500;
+            --success-green: #27ae60;
+            --error-red: #e74c3c;
+            --text-gray: #7f8c8d;
+            --light-gray: #ecf0f1;
+            --border-gray: #dfe6e9;
+            --white: #ffffff;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding-bottom: 70px; /* Space for bottom nav on mobile */
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           HEADER COMPACT
+        ============================================ */
+        .header-compact {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            color: var(--white);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-orange), #ff6b35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-details h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-details p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ============================================
+           MAIN CONTENT
+        ============================================ */
+        .dashboard-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            padding-bottom: 2rem;
+        }
+
+        /* ============================================
+           HERO CARD - SOLDE
+        ============================================ */
+        .hero-solde {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-solde::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .solde-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .solde-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: var(--white);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:active {
+            transform: rotate(360deg);
+        }
+
+        .refresh-btn.spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .solde-montant {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            line-height: 1.2;
+        }
+
+        .solde-compte {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Skeleton Loader */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s ease-in-out infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-solde {
+            width: 200px;
+            height: 40px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ============================================
+           QUICK STATS
+        ============================================ */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:active {
+            transform: scale(0.98);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 auto 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .stat-icon.blue { background: rgba(0, 71, 171, 0.1); }
+        .stat-icon.green { background: rgba(39, 174, 96, 0.1); }
+        .stat-icon.orange { background: rgba(255, 69, 0, 0.1); }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+        }
+
+        /* ============================================
+           RECENT OPERATIONS
+        ============================================ */
+        .recent-operations {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+
+        .view-all-link {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .view-all-link:hover {
+            color: var(--accent-orange);
+        }
+
+        .operations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .operation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .operation-item:active {
+            transform: scale(0.98);
+            background: #e0e6e9;
+        }
+
+        .operation-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+        }
+
+        .operation-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .operation-icon.credit {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-green);
+        }
+
+        .operation-icon.debit {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error-red);
+        }
+
+        .operation-details {
+            flex: 1;
+        }
+
+        .operation-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 0.2rem;
+        }
+
+        .operation-date {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+        }
+
+        .operation-amount {
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .operation-amount.credit {
+            color: var(--success-green);
+        }
+
+        .operation-amount.debit {
+            color: var(--error-red);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-gray);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* ============================================
+           QUICK ACTIONS
+        ============================================ */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-btn {
+            background: var(--white);
+            border: 2px solid var(--border-gray);
+            border-radius: 16px;
+            padding: 1.25rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--dark-blue);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--accent-orange), #ff6b35);
+            color: var(--white);
+            border: none;
+            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .action-btn.primary:hover {
+            box-shadow: 0 6px 16px rgba(255, 69, 0, 0.4);
+        }
+
+        .action-icon {
+            font-size: 2rem;
+        }
+
+        /* ============================================
+           BOTTOM NAVIGATION (Mobile Only)
+        ============================================ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 0.5rem 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            text-decoration: none;
+            color: var(--text-gray);
+            font-size: 0.7rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item.active {
+            color: var(--primary-blue);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: var(--primary-blue);
+            border-radius: 0 0 3px 3px;
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+
+        /* ============================================
+           PULL TO REFRESH
+        ============================================ */
+        .pull-to-refresh {
+            position: fixed;
+            top: 64px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            background: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--dark-blue);
+            font-weight: 600;
+            transition: transform 0.3s ease;
+            z-index: 99;
+        }
+
+        .pull-to-refresh.visible {
+            transform: translateX(-50%) translateY(10px);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--light-gray);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* ============================================
+           RESPONSIVE - TABLET & DESKTOP
+        ============================================ */
+        @media (min-width: 768px) {
+            body {
+                padding-bottom: 2rem;
+            }
+
+            .bottom-nav {
+                display: none;
+            }
+
+            .dashboard-content {
+                padding: 2rem;
+            }
+
+            .hero-solde {
+                padding: 2.5rem 2rem;
+            }
+
+            .solde-montant {
+                font-size: 3rem;
+            }
+
+            .quick-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 1.3rem;
+            }
+
+            .user-details h3 {
+                font-size: 1rem;
+            }
+
+            .user-details p {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-content {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 2rem;
+            }
+
+            .hero-solde {
+                grid-column: 1 / -1;
+            }
+
+            .main-column {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .sidebar-column {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+        ============================================ */
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================
+           TOAST NOTIFICATIONS
+        ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark-blue);
+            color: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            z-index: 200;
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+            max-width: 90%;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background: var(--success-green);
+        }
+
+        .toast.error {
+            background: var(--error-red);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-compact">
+        <div class="header-content">
+            <div class="user-info">
+                <div class="avatar" id="userAvatar">?</div>
+                <div class="user-details">
+                    <h3 id="userName">Chargement...</h3>
+                    <p id="userMatricule">---</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="showNotifications()" aria-label="Notifications">
+                    🔔
+                </button>
+                <button class="icon-btn" onclick="logout()" aria-label="Déconnexion">
+                    🚪
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Pull to Refresh Indicator -->
+    <div class="pull-to-refresh" id="pullToRefresh">
+        <div class="spinner"></div>
+        <span>Actualisation...</span>
+    </div>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <!-- Hero Card - Solde -->
+        <section class="hero-solde fade-in">
+            <div class="solde-header">
+                <div class="solde-label">Mon Solde PERC</div>
+                <button class="refresh-btn" onclick="refreshData()" aria-label="Actualiser">
+                    🔄
+                </button>
+            </div>
+            <div id="soldeContainer">
+                <div class="skeleton skeleton-solde"></div>
+            </div>
+            <div class="solde-compte" id="compteInfo">Compte : ---</div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section class="quick-stats fade-in">
+            <div class="stat-card">
+                <div class="stat-icon blue">📊</div>
+                <div class="stat-value" id="statMois">---</div>
+                <div class="stat-label">Ce mois</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">✓</div>
+                <div class="stat-value" id="statDerniere">---</div>
+                <div class="stat-label">Dernière op.</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">📈</div>
+                <div class="stat-value" id="statTotal">---</div>
+                <div class="stat-label">Total ops</div>
+            </div>
+        </section>
+
+        <!-- Recent Operations -->
+        <section class="recent-operations fade-in">
+            <div class="section-header">
+                <h2 class="section-title">Dernières opérations</h2>
+                <a href="#" class="view-all-link" onclick="viewAllOperations(event)">Voir tout →</a>
+            </div>
+            <div class="operations-list" id="operationsList">
+                <!-- Operations will be inserted here -->
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <p>Chargement des opérations...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions fade-in">
+            <a href="#" class="action-btn primary" onclick="makeTransfer(event)">
+                <span class="action-icon">💸</span>
+                <span>Faire un virement</span>
+            </a>
+            <a href="#" class="action-btn" onclick="viewAllOperations(event)">
+                <span class="action-icon">📋</span>
+                <span>Historique complet</span>
+            </a>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation (Mobile Only) -->
+    <nav class="bottom-nav">
+        <a href="agent-dashboard.html" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span>Accueil</span>
+        </a>
+        <a href="#" class="nav-item" onclick="viewAllOperations(event)">
+            <span class="nav-icon">📊</span>
+            <span>Opérations</span>
+        </a>
+        <a href="#" class="nav-item" onclick="makeTransfer(event)">
+            <span class="nav-icon">💸</span>
+            <span>Virement</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showProfile(event)">
+            <span class="nav-icon">👤</span>
+            <span>Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        // Auto-detect API base URL (localhost or network IP)
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000/api'
+            : `http://${window.location.hostname}:3000/api`;
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            const token = localStorage.getItem('percAgentToken');
+            if (!token) {
+                window.location.href = 'agent-login.html';
+                return;
+            }
+
+            // Load user data from localStorage
+            loadUserInfo();
+
+            // Load dashboard data
+            await loadDashboardData();
+
+            // Setup pull-to-refresh
+            setupPullToRefresh();
+
+            // Setup haptic feedback
+            setupHapticFeedback();
+        });
+
+        // ============================================
+        // LOAD USER INFO
+        // ============================================
+        function loadUserInfo() {
+            const user = JSON.parse(localStorage.getItem('percAgentUser') || '{}');
+
+            if (user.nom) {
+                document.getElementById('userName').textContent = user.nom;
+                document.getElementById('userMatricule').textContent = user.matricule || '';
+
+                // Set avatar initial
+                const initials = user.nom.split(' ')
+                    .map(word => word[0])
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase();
+                document.getElementById('userAvatar').textContent = initials;
+            }
+        }
+
+        // ============================================
+        // LOAD DASHBOARD DATA
+        // ============================================
+        async function loadDashboardData() {
+            const token = localStorage.getItem('percAgentToken');
+
+            try {
+                // Load solde
+                const soldeResponse = await fetch(`${API_BASE}/perc/solde`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (soldeResponse.ok) {
+                    const soldeData = await soldeResponse.json();
+                    displaySolde(soldeData);
+                } else if (soldeResponse.status === 401) {
+                    logout();
+                    return;
+                }
+
+                // Load operations
+                const opsResponse = await fetch(`${API_BASE}/perc/operations?limit=5`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (opsResponse.ok) {
+                    const opsData = await opsResponse.json();
+                    displayOperations(opsData.data || []);
+                    updateQuickStats(opsData.data || []);
+                }
+
+            } catch (error) {
+                console.error('Erreur chargement dashboard:', error);
+                showToast('Erreur de chargement des données', 'error');
+            }
+        }
+
+        // ============================================
+        // DISPLAY SOLDE
+        // ============================================
+        function displaySolde(data) {
+            const container = document.getElementById('soldeContainer');
+            const solde = parseFloat(data.solde || 0);
+
+            // Animate counter
+            animateCounter(0, solde, 1000, (value) => {
+                container.innerHTML = `
+                    <div class="solde-montant">${formatMontant(value)} FCFA</div>
+                `;
+            });
+
+            // Update compte info
+            if (data.compte_cgf) {
+                document.getElementById('compteInfo').textContent = `Compte : ${data.compte_cgf}`;
+            }
+        }
+
+        // ============================================
+        // DISPLAY OPERATIONS
+        // ============================================
+        function displayOperations(operations) {
+            const container = document.getElementById('operationsList');
+
+            if (operations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Aucune opération récente</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = operations.map(op => {
+                const isCredit = parseFloat(op.montant) > 0;
+                const icon = isCredit ? '↓' : '↑';
+                const type = isCredit ? 'credit' : 'debit';
+
+                return `
+                    <div class="operation-item">
+                        <div class="operation-left">
+                            <div class="operation-icon ${type}">
+                                ${icon}
+                            </div>
+                            <div class="operation-details">
+                                <div class="operation-label">${op.libelle || 'Opération'}</div>
+                                <div class="operation-date">${formatDate(op.date_operation)}</div>
+                            </div>
+                        </div>
+                        <div class="operation-amount ${type}">
+                            ${isCredit ? '+' : ''}${formatMontant(op.montant)} FCFA
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // UPDATE QUICK STATS
+        // ============================================
+        function updateQuickStats(operations) {
+            // Total ce mois
+            const now = new Date();
+            const thisMonth = operations.filter(op => {
+                const opDate = new Date(op.date_operation);
+                return opDate.getMonth() === now.getMonth() &&
+                       opDate.getFullYear() === now.getFullYear();
+            });
+
+            const totalMois = thisMonth.reduce((sum, op) => sum + parseFloat(op.montant), 0);
+            document.getElementById('statMois').textContent = formatMontant(Math.abs(totalMois));
+
+            // Dernière opération
+            if (operations.length > 0) {
+                const lastOp = operations[0];
+                const lastAmount = formatMontant(Math.abs(lastOp.montant));
+                document.getElementById('statDerniere').textContent = lastAmount;
+            }
+
+            // Total opérations
+            document.getElementById('statTotal').textContent = operations.length;
+        }
+
+        // ============================================
+        // REFRESH DATA
+        // ============================================
+        async function refreshData() {
+            const btn = event?.target;
+            if (btn) {
+                btn.classList.add('spinning');
+            }
+
+            await loadDashboardData();
+            showToast('Données actualisées', 'success');
+
+            if (btn) {
+                setTimeout(() => btn.classList.remove('spinning'), 1000);
+            }
+        }
+
+        // ============================================
+        // PULL TO REFRESH
+        // ============================================
+        function setupPullToRefresh() {
+            let startY = 0;
+            let pulling = false;
+
+            document.addEventListener('touchstart', (e) => {
+                if (window.scrollY === 0) {
+                    startY = e.touches[0].pageY;
+                    pulling = true;
+                }
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!pulling) return;
+
+                const currentY = e.touches[0].pageY;
+                const diff = currentY - startY;
+
+                if (diff > 80) {
+                    document.getElementById('pullToRefresh').classList.add('visible');
+                }
+            });
+
+            document.addEventListener('touchend', async () => {
+                if (pulling && document.getElementById('pullToRefresh').classList.contains('visible')) {
+                    await refreshData();
+
+                    setTimeout(() => {
+                        document.getElementById('pullToRefresh').classList.remove('visible');
+                    }, 500);
+                }
+                pulling = false;
+            });
+        }
+
+        // ============================================
+        // HAPTIC FEEDBACK
+        // ============================================
+        function setupHapticFeedback() {
+            document.querySelectorAll('.action-btn, .icon-btn, .nav-item').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                    }
+                });
+            });
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function formatMontant(montant) {
+            const num = Math.abs(parseFloat(montant));
+            if (isNaN(num)) return '0';
+
+            // Remove decimals if .00
+            const formatted = num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
+
+            // Add spaces for thousands
+            return formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            return date.toLocaleDateString('fr-FR', options);
+        }
+
+        function animateCounter(start, end, duration, callback) {
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                const current = start + (end - start) * easeOutQuad(progress);
+                callback(current);
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        function easeOutQuad(t) {
+            return t * (2 - t);
+        }
+
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================
+        // NAVIGATION ACTIONS
+        // ============================================
+        function viewAllOperations(event) {
+            event.preventDefault();
+            showToast('Page Historique en construction', 'info');
+            // TODO: Navigate to operations page
+        }
+
+        function makeTransfer(event) {
+            event.preventDefault();
+            showToast('Page Virement en construction', 'info');
+            // TODO: Navigate to transfer page
+        }
+
+        function showProfile(event) {
+            event.preventDefault();
+            showToast('Page Profil en construction', 'info');
+            // TODO: Navigate to profile page
+        }
+
+        function showNotifications() {
+            showToast('Aucune nouvelle notification', 'info');
+        }
+
+        function logout() {
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                localStorage.removeItem('percAgentToken');
+                localStorage.removeItem('percAgentUser');
+                window.location.href = 'agent-login.html';
+            }
+        }
+    </script>
+</body>
+</html>

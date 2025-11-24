@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { query } = require('../config/database');
-const authMiddleware = require('../middleware/auth');
+const { authMiddleware } = require('../middleware/auth');
 
 // Middleware d'authentification sur toutes les routes PERC
 router.use(authMiddleware);
@@ -216,7 +216,7 @@ router.get('/statistiques/:annee', async (req, res) => {
         const { annee } = req.params;
 
         const stats = await query(
-            `SELECT 
+            `SELECT
                 EXTRACT(MONTH FROM date_contribution) as mois,
                 COUNT(*) as nombre,
                 SUM(montant) as total
@@ -241,6 +241,92 @@ router.get('/statistiques/:annee', async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors du chargement des statistiques'
+        });
+    }
+});
+
+// GET /api/perc/solde - Récupérer uniquement le solde
+router.get('/solde', async (req, res) => {
+    try {
+        const { matricule } = req.user;
+
+        const result = await query(
+            `SELECT a.compte_cgf, a.solde_actuel
+             FROM perc_accounts a
+             JOIN perc_participants p ON a.participant_id = p.id
+             WHERE p.matricule = $1`,
+            [matricule]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Compte non trouvé'
+            });
+        }
+
+        res.json({
+            success: true,
+            solde: result.rows[0].solde_actuel,
+            compte_cgf: result.rows[0].compte_cgf
+        });
+
+    } catch (error) {
+        console.error('Erreur solde:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors du chargement du solde'
+        });
+    }
+});
+
+// GET /api/perc/operations - Récupérer les opérations (contributions + mouvements)
+router.get('/operations', async (req, res) => {
+    try {
+        const { matricule } = req.user;
+        const { limit = 5 } = req.query;
+
+        // Combiner contributions et mouvements
+        const operations = await query(
+            `SELECT
+                'contribution' as type,
+                c.montant,
+                c.date_contribution as date_operation,
+                CONCAT('Contribution ', c.periode) as libelle,
+                c.type_contribution
+             FROM perc_contributions c
+             JOIN perc_accounts a ON c.account_id = a.id
+             JOIN perc_participants p ON a.participant_id = p.id
+             WHERE p.matricule = $1
+
+             UNION ALL
+
+             SELECT
+                'mouvement' as type,
+                m.montant,
+                m.date_mouvement as date_operation,
+                m.description as libelle,
+                m.type_mouvement as type_contribution
+             FROM perc_movements m
+             JOIN perc_accounts a ON m.account_id = a.id
+             JOIN perc_participants p ON a.participant_id = p.id
+             WHERE p.matricule = $1
+
+             ORDER BY date_operation DESC
+             LIMIT $2`,
+            [matricule, limit]
+        );
+
+        res.json({
+            success: true,
+            data: operations.rows
+        });
+
+    } catch (error) {
+        console.error('Erreur operations:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors du chargement des opérations'
         });
     }
 });
